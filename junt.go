@@ -6,10 +6,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"./models"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"masukomi.org/junt/models"
+	// if this wasn't a go module
+	// we would import with "./models"
 )
 
 func main() {
