@@ -12,6 +12,7 @@ import (
 	"masukomi.org/junt/models"
 	// if this wasn't a go module
 	// we would import with "./models"
+	"masukomi.org/junt/controllers"
 )
 
 func main() {
@@ -23,14 +24,16 @@ func main() {
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
 
-	// router, err := rest.MakeRouter(
-	// 	rest.Get("/companies",
-	// )
-
-	// api.SetApp(rest.AppSimple(func(w rest.ResponseWriter,
-	// 	r *rest.Request) {
-	// 	w.WriteJson(map[string]string{"Body": "Hello World!"})
-	// }))
+	cc := controllers.CompaniesController{i.DB}
+	router, err := rest.MakeRouter(
+		rest.Get("/companies", cc.ListAll),
+		rest.Get("/companies/:id", cc.FindById),
+		rest.Post("/companies", cc.Create),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	api.SetApp(router)
 	log.Fatal(http.ListenAndServe(":8123", api.MakeHandler()))
 }
 

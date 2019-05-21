@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/jinzhu/gorm"
 	"time"
 )
 
@@ -31,32 +30,4 @@ type Company struct {
 	Note      string    `sql:"type:text;" json:"note"` // markdown
 	CreatedAt time.Time `json:"created_at"`            // generated if not supplied
 	UpdatedAt time.Time `json:"updated_at"`            // generated if not supplied
-	Db        gorm.DB   `gorm:"-"`                     // not persisted
-}
-
-func (c *Company) FindById(db gorm.DB, id int64) Company {
-	var company Company
-	err := db.First(&company, id)
-	if err != nil {
-		company.Db = db
-	} // else ???? it's not an Error method it's a ...string?
-	return company
-}
-
-func (c Company) save() bool {
-	c.Db.Save(c)
-	return true // or false
-}
-
-func (c *Company) GetAll(db gorm.DB) ([]Company, error) {
-	var companies []Company
-	err := db.Find(&companies).Error
-	if err != nil {
-		for i := 0; i < len(companies); i++ {
-			companies[i].Db = db
-		}
-		return companies, nil
-	} else {
-		return nil, err
-	}
 }
