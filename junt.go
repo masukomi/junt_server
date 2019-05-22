@@ -25,10 +25,15 @@ func main() {
 	api.Use(rest.DefaultDevStack...)
 
 	cc := controllers.CompaniesController{i.DB}
+	jc := controllers.JobsController{i.DB}
 	router, err := rest.MakeRouter(
 		rest.Get("/companies", cc.ListAll),
 		rest.Get("/companies/:id", cc.FindById),
 		rest.Post("/companies", cc.Create),
+
+		rest.Get("/jobs", jc.ListAll),
+		rest.Get("/jobs/:id", jc.FindById),
+		rest.Post("/jobs", jc.Create),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -63,5 +68,7 @@ func (i *Impl) InitDB() {
 }
 
 func (i *Impl) InitSchema() {
-	i.DB.AutoMigrate(&models.Company{})
+	// WARNING: will only create tables, missing columns, and missing indexes.
+	// will NOT change existing column's type or delete unused columns
+	i.DB.AutoMigrate(&models.Company{}, &models.Job{})
 }
