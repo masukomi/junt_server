@@ -28,6 +28,7 @@ func main() {
 	jc := controllers.JobsController{i.DB}
 	pc := controllers.PeopleController{i.DB}
 	fc := controllers.FollowupsController{i.DB}
+	hc := controllers.HomeworksController{i.DB}
 	router, err := rest.MakeRouter(
 		rest.Get("/companies", cc.ListAll),
 		rest.Get("/companies/:id", cc.FindById),
@@ -36,6 +37,10 @@ func main() {
 		rest.Get("/followups", fc.ListAll),
 		rest.Get("/followups/:id", fc.FindById),
 		rest.Post("/followups", fc.Create),
+
+		rest.Get("/homeworks", hc.ListAll),
+		rest.Get("/homeworks/:id", hc.FindById),
+		rest.Post("/homeworks", hc.Create),
 
 		rest.Get("/people", pc.ListAll),
 		rest.Get("/people/:id", pc.FindById),
