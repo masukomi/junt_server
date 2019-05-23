@@ -70,5 +70,15 @@ func (i *Impl) InitDB() {
 func (i *Impl) InitSchema() {
 	// WARNING: will only create tables, missing columns, and missing indexes.
 	// will NOT change existing column's type or delete unused columns
-	i.DB.AutoMigrate(&models.Company{}, &models.Job{})
+	i.DB.AutoMigrate(
+		&models.Company{},
+		&models.Followup{},
+		&models.Homework{},
+		&models.Interview{},
+		&models.Job{},
+		&models.Offer{},
+		&models.Person{},
+		&models.StatusChange{},
+		&models.ThanksEmail{},
+	)
 }
