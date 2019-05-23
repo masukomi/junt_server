@@ -26,6 +26,6 @@ type Interview struct {
 
 	JobID  int64 `json:"job_id"`
 	Job    Job
-	People []Person `gorm:"many2many:people_thanks_emails;"`
+	People []Person `gorm:"many2many:interviews_people;"`
 	// has and belongs to many jobs
 }
