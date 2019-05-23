@@ -46,4 +46,5 @@ type Job struct {
 	CreatedAt         time.Time `json:"created_at"`             // generated if not supplied
 	UpdatedAt         time.Time `json:"updated_at"`             // generated if not supplied
 	People            []Person  `gorm:"many2many:jobs_people;"` // has and belongs to many people
+	Company           Company   `gorm:"foreignkey:CompanyId"`
 }
