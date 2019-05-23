@@ -25,11 +25,12 @@ func main() {
 	api.Use(rest.DefaultDevStack...)
 
 	cc := controllers.CompaniesController{i.DB}
-	jc := controllers.JobsController{i.DB}
 	pc := controllers.PeopleController{i.DB}
 	fc := controllers.FollowupsController{i.DB}
 	hc := controllers.HomeworksController{i.DB}
 	ic := controllers.InterviewsController{i.DB}
+	jc := controllers.JobsController{i.DB}
+	oc := controllers.OffersController{i.DB}
 	router, err := rest.MakeRouter(
 		rest.Get("/companies", cc.ListAll),
 		rest.Get("/companies/:id", cc.FindById),
@@ -47,13 +48,17 @@ func main() {
 		rest.Get("/interviews/:id", ic.FindById),
 		rest.Post("/interviews", ic.Create),
 
-		rest.Get("/people", pc.ListAll),
-		rest.Get("/people/:id", pc.FindById),
-		rest.Post("/people", pc.Create),
-
 		rest.Get("/jobs", jc.ListAll),
 		rest.Get("/jobs/:id", jc.FindById),
 		rest.Post("/jobs", jc.Create),
+
+		rest.Get("/offers", oc.ListAll),
+		rest.Get("/offers/:id", oc.FindById),
+		rest.Post("/offers", oc.Create),
+
+		rest.Get("/people", pc.ListAll),
+		rest.Get("/people/:id", pc.FindById),
+		rest.Post("/people", pc.Create),
 	)
 	if err != nil {
 		log.Fatal(err)
