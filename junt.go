@@ -31,6 +31,8 @@ func main() {
 	ic := controllers.InterviewsController{i.DB}
 	jc := controllers.JobsController{i.DB}
 	oc := controllers.OffersController{i.DB}
+	sc := controllers.StatusChangesController{i.DB}
+	tc := controllers.ThanksEmailsController{i.DB}
 	router, err := rest.MakeRouter(
 		rest.Get("/companies", cc.ListAll),
 		rest.Get("/companies/:id", cc.FindById),
@@ -59,6 +61,14 @@ func main() {
 		rest.Get("/people", pc.ListAll),
 		rest.Get("/people/:id", pc.FindById),
 		rest.Post("/people", pc.Create),
+
+		rest.Get("/status_changes", sc.ListAll),
+		rest.Get("/status_changes/:id", sc.FindById),
+		rest.Post("/status_changes", sc.Create),
+
+		rest.Get("/thanks_emails", tc.ListAll),
+		rest.Get("/thanks_emails/:id", tc.FindById),
+		rest.Post("/thanks_emails", tc.Create),
 	)
 	if err != nil {
 		log.Fatal(err)
