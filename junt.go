@@ -26,10 +26,20 @@ func main() {
 
 	cc := controllers.CompaniesController{i.DB}
 	jc := controllers.JobsController{i.DB}
+	pc := controllers.PeopleController{i.DB}
+	fc := controllers.FollowupsController{i.DB}
 	router, err := rest.MakeRouter(
 		rest.Get("/companies", cc.ListAll),
 		rest.Get("/companies/:id", cc.FindById),
 		rest.Post("/companies", cc.Create),
+
+		rest.Get("/followups", fc.ListAll),
+		rest.Get("/followups/:id", fc.FindById),
+		rest.Post("/followups", fc.Create),
+
+		rest.Get("/people", pc.ListAll),
+		rest.Get("/people/:id", pc.FindById),
+		rest.Post("/people", pc.Create),
 
 		rest.Get("/jobs", jc.ListAll),
 		rest.Get("/jobs/:id", jc.FindById),
