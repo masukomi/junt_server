@@ -33,10 +33,14 @@ func main() {
 	oc := controllers.OffersController{i.DB}
 	sc := controllers.StatusChangesController{i.DB}
 	tc := controllers.ThanksEmailsController{i.DB}
+	ec := controllers.EventsController{i.DB}
 	router, err := rest.MakeRouter(
 		rest.Get("/companies", cc.ListAll),
 		rest.Get("/companies/:id", cc.FindById),
 		rest.Post("/companies", cc.Create),
+
+		rest.Get("/events", ec.ListAll),
+		rest.Get("/events/job/:id", ec.ListAllForJob),
 
 		rest.Get("/followups", fc.ListAll),
 		rest.Get("/followups/:id", fc.FindById),
