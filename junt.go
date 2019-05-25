@@ -44,14 +44,17 @@ func main() {
 
 		rest.Get("/followups", fc.ListAll),
 		rest.Get("/followups/:id", fc.FindById),
+		rest.Delete("/followups/:id", fc.Delete),
 		rest.Post("/followups", fc.Create),
 
 		rest.Get("/homeworks", hc.ListAll),
 		rest.Get("/homeworks/:id", hc.FindById),
+		rest.Delete("/homeworks/:id", hc.Delete),
 		rest.Post("/homeworks", hc.Create),
 
 		rest.Get("/interviews", ic.ListAll),
 		rest.Get("/interviews/:id", ic.FindById),
+		rest.Delete("/interviews/:id", ic.Delete),
 		rest.Post("/interviews", ic.Create),
 
 		rest.Get("/jobs", jc.ListAll),
@@ -60,6 +63,7 @@ func main() {
 
 		rest.Get("/offers", oc.ListAll),
 		rest.Get("/offers/:id", oc.FindById),
+		rest.Delete("/offers/:id", oc.Delete),
 		rest.Post("/offers", oc.Create),
 
 		rest.Get("/people", pc.ListAll),
@@ -68,10 +72,12 @@ func main() {
 
 		rest.Get("/status_changes", sc.ListAll),
 		rest.Get("/status_changes/:id", sc.FindById),
+		rest.Delete("/status_changes/:id", sc.Delete),
 		rest.Post("/status_changes", sc.Create),
 
 		rest.Get("/thanks_emails", tc.ListAll),
 		rest.Get("/thanks_emails/:id", tc.FindById),
+		rest.Delete("/thanks_emails/:id", tc.Delete),
 		rest.Post("/thanks_emails", tc.Create),
 	)
 	if err != nil {

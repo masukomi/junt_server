@@ -26,3 +26,8 @@ type Event struct {
 	JobId int64  `json:"job_id"`
 	Job   Job    `gorm:"foreignkey:JobId"`
 }
+
+// implementing IEvent interface
+func (e Event) CreationDate() time.Time {
+	return e.CreatedAt
+}

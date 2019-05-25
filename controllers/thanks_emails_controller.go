@@ -16,17 +16,17 @@ type ThanksEmailsController struct {
 func (cc *ThanksEmailsController) Create(w rest.ResponseWriter,
 	r *rest.Request) {
 
-	thanks_email := models.ThanksEmail{}
-	if err := r.DecodeJsonPayload(&thanks_email); err != nil {
+	thanksEmail := models.ThanksEmail{}
+	if err := r.DecodeJsonPayload(&thanksEmail); err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := cc.Db.Save(&thanks_email).Error; err != nil {
+	if err := cc.Db.Save(&thanksEmail).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteJson(
-		map[string]interface{}{"status": "SUCCESS", "id": thanks_email.Id})
+		map[string]interface{}{"status": "SUCCESS", "id": thanksEmail.Id})
 
 }
 
@@ -34,17 +34,34 @@ func (cc *ThanksEmailsController) FindById(w rest.ResponseWriter,
 	r *rest.Request) {
 
 	id := r.PathParam("id")
-	thanks_email := models.ThanksEmail{}
-	if cc.Db.First(&thanks_email, id).Error != nil {
+	thanksEmail := models.ThanksEmail{}
+	if cc.Db.First(&thanksEmail, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
-	w.WriteJson(&thanks_email)
+	w.WriteJson(&thanksEmail)
+}
+
+func (cc *ThanksEmailsController) Delete(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	thanksEmail := models.ThanksEmail{}
+	if cc.Db.First(&thanksEmail, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	if err := cc.Db.Delete(&thanksEmail).Error; err != nil {
+		w.WriteJson(map[string]string{"status": "SUCCESS"})
+		return
+	} else {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (cc *ThanksEmailsController) ListAll(w rest.ResponseWriter,
 	r *rest.Request) {
-	thanks_emails := []models.ThanksEmail{}
-	cc.Db.Find(&thanks_emails)
-	w.WriteJson(&thanks_emails)
+	thanksEmails := []models.ThanksEmail{}
+	cc.Db.Find(&thanksEmails)
+	w.WriteJson(&thanksEmails)
 }

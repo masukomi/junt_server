@@ -42,6 +42,23 @@ func (cc *CompaniesController) FindById(w rest.ResponseWriter,
 	w.WriteJson(&company)
 }
 
+func (cc *CompaniesController) Delete(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	company := models.Company{}
+	if cc.Db.First(&company, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	if err := cc.Db.Delete(&company).Error; err != nil {
+		w.WriteJson(map[string]string{"status": "SUCCESS"})
+		return
+	} else {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func (cc *CompaniesController) ListAll(w rest.ResponseWriter,
 	r *rest.Request) {
 	companies := []models.Company{}

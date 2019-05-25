@@ -42,6 +42,23 @@ func (cc *InterviewsController) FindById(w rest.ResponseWriter,
 	w.WriteJson(&interview)
 }
 
+func (cc *InterviewsController) Delete(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	interview := models.Interview{}
+	if cc.Db.First(&interview, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	if err := cc.Db.Delete(&interview).Error; err != nil {
+		w.WriteJson(map[string]string{"status": "SUCCESS"})
+		return
+	} else {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func (cc *InterviewsController) ListAll(w rest.ResponseWriter,
 	r *rest.Request) {
 	interviews := []models.Interview{}

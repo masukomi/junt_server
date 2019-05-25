@@ -42,6 +42,23 @@ func (cc *FollowupsController) FindById(w rest.ResponseWriter,
 	w.WriteJson(&followup)
 }
 
+func (cc *FollowupsController) Delete(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	followup := models.Followup{}
+	if cc.Db.First(&followup, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	if err := cc.Db.Delete(&followup).Error; err != nil {
+		w.WriteJson(map[string]string{"status": "SUCCESS"})
+		return
+	} else {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func (cc *FollowupsController) ListAll(w rest.ResponseWriter,
 	r *rest.Request) {
 	followups := []models.Followup{}

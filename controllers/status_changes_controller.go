@@ -16,17 +16,17 @@ type StatusChangesController struct {
 func (cc *StatusChangesController) Create(w rest.ResponseWriter,
 	r *rest.Request) {
 
-	status_change := models.StatusChange{}
-	if err := r.DecodeJsonPayload(&status_change); err != nil {
+	statusChange := models.StatusChange{}
+	if err := r.DecodeJsonPayload(&statusChange); err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := cc.Db.Save(&status_change).Error; err != nil {
+	if err := cc.Db.Save(&statusChange).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteJson(
-		map[string]interface{}{"status": "SUCCESS", "id": status_change.Id})
+		map[string]interface{}{"status": "SUCCESS", "id": statusChange.Id})
 
 }
 
@@ -34,17 +34,34 @@ func (cc *StatusChangesController) FindById(w rest.ResponseWriter,
 	r *rest.Request) {
 
 	id := r.PathParam("id")
-	status_change := models.StatusChange{}
-	if cc.Db.First(&status_change, id).Error != nil {
+	statusChange := models.StatusChange{}
+	if cc.Db.First(&statusChange, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
-	w.WriteJson(&status_change)
+	w.WriteJson(&statusChange)
+}
+
+func (cc *StatusChangesController) Delete(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	statusChange := models.StatusChange{}
+	if cc.Db.First(&statusChange, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	if err := cc.Db.Delete(&statusChange).Error; err != nil {
+		w.WriteJson(map[string]string{"status": "SUCCESS"})
+		return
+	} else {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (cc *StatusChangesController) ListAll(w rest.ResponseWriter,
 	r *rest.Request) {
-	status_changes := []models.StatusChange{}
-	cc.Db.Find(&status_changes)
-	w.WriteJson(&status_changes)
+	statusChanges := []models.StatusChange{}
+	cc.Db.Find(&statusChanges)
+	w.WriteJson(&statusChanges)
 }

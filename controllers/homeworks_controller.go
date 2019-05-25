@@ -42,6 +42,23 @@ func (cc *HomeworksController) FindById(w rest.ResponseWriter,
 	w.WriteJson(&homework)
 }
 
+func (cc *HomeworksController) Delete(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	homework := models.Homework{}
+	if cc.Db.First(&homework, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	if err := cc.Db.Delete(&homework).Error; err != nil {
+		w.WriteJson(map[string]string{"status": "SUCCESS"})
+		return
+	} else {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func (cc *HomeworksController) ListAll(w rest.ResponseWriter,
 	r *rest.Request) {
 	homeworks := []models.Homework{}
