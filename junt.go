@@ -39,6 +39,9 @@ func main() {
 		rest.Get("/companies/:id", cc.FindById),
 		rest.Post("/companies", cc.Create),
 
+		// events is a read only endpoint
+		// because it returns all structs that
+		// implement the IEvent interface
 		rest.Get("/events", ec.ListAll),
 		rest.Get("/events/job/:id", ec.ListAllForJob),
 
