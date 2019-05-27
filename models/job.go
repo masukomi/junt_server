@@ -73,3 +73,21 @@ func (j Job) HolisticDeletion(db *gorm.DB) (bool, error) {
 		return false, err
 	}
 }
+
+func (j Job) TransactionlessHolisticDeletion(db *gorm.DB) (bool, error) {
+	iEvents, _ := GetIEvents(db, j.Id)
+	// delete all the events
+	for _, event := range iEvents {
+		err := db.Delete(event).Error
+		if err != nil {
+			return false, err
+			return false, err
+		}
+	}
+	// delete the job
+	if err := db.Delete(&j).Error; err != nil {
+		return true, nil
+	} else {
+		return false, err
+	}
+}
