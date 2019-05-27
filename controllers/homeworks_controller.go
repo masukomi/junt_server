@@ -51,9 +51,9 @@ func (cc *HomeworksController) Delete(w rest.ResponseWriter,
 		rest.NotFound(w, r)
 		return
 	}
-	if err := cc.Db.Delete(&homework).Error; err != nil {
+	success, err := homework.HolisticDeletion(cc.Db)
+	if success {
 		w.WriteJson(map[string]string{"status": "SUCCESS"})
-		return
 	} else {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 	}

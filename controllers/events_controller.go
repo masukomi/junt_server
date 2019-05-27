@@ -25,7 +25,7 @@ func (ec *EventsController) ListAll(w rest.ResponseWriter,
 func (ec *EventsController) ListAllForJob(w rest.ResponseWriter,
 	r *rest.Request) {
 	strId := r.PathParam("id")
-	id, err := strconv.Atoi(strId)
+	id, err := strconv.ParseInt(strId, 10, 64)
 	if err == nil {
 		events, _ := models.GetIEvents(ec.Db, id)
 		// err is only if you have > 1 jobId which we don't ;)

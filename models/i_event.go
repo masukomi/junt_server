@@ -33,7 +33,7 @@ func (e ByCreationDate) Swap(i, j int) {
 
 /// end madness... for now
 
-func GetIEvents(db *gorm.DB, jobIds ...int) ([]IEvent, error) {
+func GetIEvents(db *gorm.DB, jobIds ...int64) ([]IEvent, error) {
 	if len(jobIds) > 1 {
 		return []IEvent{}, errors.New("maximum of one job per request")
 	}
@@ -68,7 +68,7 @@ func GetIEvents(db *gorm.DB, jobIds ...int) ([]IEvent, error) {
 	sort.Sort(ByCreationDate(iEvents))
 	return iEvents, nil
 }
-func GenerateIEventWhereClause(jobIds ...int) string {
+func GenerateIEventWhereClause(jobIds ...int64) string {
 	if len(jobIds) > 0 {
 		return fmt.Sprintf("where job_id = %v", jobIds[0])
 		// don't need to worry about SQL Injection because
