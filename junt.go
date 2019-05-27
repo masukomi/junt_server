@@ -62,6 +62,7 @@ func main() {
 
 		rest.Get("/jobs", jc.ListAll),
 		rest.Get("/jobs/:id", jc.FindById),
+		rest.Delete("/jobs/:id", jc.Delete),
 		rest.Post("/jobs", jc.Create),
 
 		rest.Get("/offers", oc.ListAll),
