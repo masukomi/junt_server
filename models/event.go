@@ -1,6 +1,8 @@
 package models
 
 import (
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
 )
 
@@ -30,4 +32,17 @@ type Event struct {
 // implementing IEvent interface
 func (e Event) CreationDate() time.Time {
 	return e.CreatedAt
+}
+
+func (e Event) HolisticDeletion(db *gorm.DB) (bool, error) {
+
+	transaction := db.Begin()
+	if err := db.Delete(&e).Error; err != nil {
+		transaction.Commit()
+		return true, nil
+	} else {
+		transaction.Rollback()
+		return false, err
+	}
+
 }

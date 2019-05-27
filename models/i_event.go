@@ -1,11 +1,13 @@
 package models
 
 import (
+	"github.com/jinzhu/gorm"
 	"time"
 )
 
 type IEvent interface {
 	CreationDate() time.Time
+	HolisticDeletion(db *gorm.DB) (bool, error)
 }
 
 // the folowing BS is because Go hates you
