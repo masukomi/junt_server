@@ -48,3 +48,20 @@ func (cc *JobsController) ListAll(w rest.ResponseWriter,
 	cc.Db.Find(&jobs)
 	w.WriteJson(&jobs)
 }
+
+func (cc *JobsController) Delete(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	job := models.Job{}
+	if cc.Db.First(&job, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	success, err := job.HolisticDeletion(cc.Db)
+	if success {
+		w.WriteJson(map[string]string{"status": "SUCCESS"})
+	} else {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}

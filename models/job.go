@@ -1,7 +1,8 @@
 package models
 
 import (
-	// "github.com/jinzhu/gorm"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
 )
 
@@ -47,4 +48,28 @@ type Job struct {
 	UpdatedAt         time.Time `json:"updated_at"`             // generated if not supplied
 	People            []Person  `gorm:"many2many:jobs_people;"` // has and belongs to many people
 	Company           Company   `gorm:"foreignkey:CompanyId"`
+}
+
+func (j Job) HolisticDeletion(db *gorm.DB) (bool, error) {
+
+	transaction := db.Begin()
+	// find all the events
+	// returns slice of IEvent objects
+	iEvents, _ := GetIEvents(db, j.Id)
+	// delete all the events
+	for _, event := range iEvents {
+		err := db.Delete(event).Error
+		if err != nil {
+			transaction.Rollback()
+			return false, err
+		}
+	}
+	// delete the job
+	if err := db.Delete(&j).Error; err != nil {
+		transaction.Commit()
+		return true, nil
+	} else {
+		transaction.Rollback()
+		return false, err
+	}
 }
