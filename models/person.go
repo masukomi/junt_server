@@ -1,7 +1,8 @@
 package models
 
 import (
-	// "github.com/jinzhu/gorm"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
 )
 
@@ -39,4 +40,17 @@ type Person struct {
 	Jobs         []Job         `gorm:"many2many:jobs_people;"` // has and belongs to many jobs
 	Company      Company       `gorm:"gorm:foreignkey:CompanyId"`
 	ThanksEmails []ThanksEmail `gorm:"many2many:people_thanks_emails;"` // has and belongs to many jobs
+}
+
+func (p Person) HolisticDeletion(db *gorm.DB) (bool, error) {
+
+	transaction := db.Begin()
+	if err := db.Delete(&p).Error; err != nil {
+		transaction.Commit()
+		return true, nil
+	} else {
+		transaction.Rollback()
+		return false, err
+	}
+
 }

@@ -48,3 +48,20 @@ func (cc *PeopleController) ListAll(w rest.ResponseWriter,
 	cc.Db.Find(&people)
 	w.WriteJson(&people)
 }
+
+func (cc *PeopleController) Delete(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	person := models.Person{}
+	if cc.Db.First(&person, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	success, err := person.HolisticDeletion(cc.Db)
+	if success {
+		w.WriteJson(map[string]string{"status": "SUCCESS"})
+	} else {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
