@@ -72,3 +72,29 @@ func (cc *ThanksEmailsController) ListAll(w rest.ResponseWriter,
 	cc.Db.Find(&thanksEmails)
 	w.WriteJson(&thanksEmails)
 }
+
+func (tec *ThanksEmailController) Update(w rest.ResponseWriter, r *rest.Request) {
+
+	id := r.PathParam("id")
+	thanksEmail := model.ThanksEmail{}
+	if tec.Db.First(&reminder, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+
+	// TODO decode into
+	var data map[string]interface{}
+	if err := r.DecodeJsonPayload(&data); err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// TODO for each key, copy over changes from data to thanksEmail
+	// TODO IF people_ids key is present call
+	//    thanksEmail.ConvertIdsToPeople(tec.Db)
+
+	if err := tec.Db.Save(&thanksEmail).Error; err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteJson(map[string]string{"status": "SUCCESS"})
+}
