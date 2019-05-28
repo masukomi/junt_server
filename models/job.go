@@ -50,9 +50,8 @@ type Job struct {
 	Company           Company   `gorm:"foreignkey:CompanyId"`
 }
 
-func (j Job) HolisticDeletion(db *gorm.DB) (bool, error) {
+func (j Job) transactionableHolisticDeletion(db *gorm.DB, transaction *gorm.DB) (bool, error) {
 
-	transaction := db.Begin()
 	// find all the events
 	// returns slice of IEvent objects
 	iEvents, _ := GetIEvents(db, j.Id)
@@ -60,34 +59,30 @@ func (j Job) HolisticDeletion(db *gorm.DB) (bool, error) {
 	for _, event := range iEvents {
 		err := db.Delete(event).Error
 		if err != nil {
-			transaction.Rollback()
+			if transaction != nil {
+				transaction.Rollback()
+			}
 			return false, err
 		}
 	}
 	// delete the job
 	if err := db.Delete(&j).Error; err != nil {
-		transaction.Commit()
+		if transaction != nil {
+			transaction.Commit()
+		}
 		return true, nil
 	} else {
-		transaction.Rollback()
+		if transaction != nil {
+			transaction.Rollback()
+		}
 		return false, err
 	}
 }
 
+func (j Job) HolisticDeletion(db *gorm.DB) (bool, error) {
+	return j.transactionableHolisticDeletion(db, db.Begin())
+}
+
 func (j Job) TransactionlessHolisticDeletion(db *gorm.DB) (bool, error) {
-	iEvents, _ := GetIEvents(db, j.Id)
-	// delete all the events
-	for _, event := range iEvents {
-		err := db.Delete(event).Error
-		if err != nil {
-			return false, err
-			return false, err
-		}
-	}
-	// delete the job
-	if err := db.Delete(&j).Error; err != nil {
-		return true, nil
-	} else {
-		return false, err
-	}
+	return j.transactionableHolisticDeletion(db, nil)
 }
