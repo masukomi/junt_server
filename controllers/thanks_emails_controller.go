@@ -21,6 +21,13 @@ func (cc *ThanksEmailsController) Create(w rest.ResponseWriter,
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if err := thanksEmail.ConvertIdsToPeople(cc.Db); err != nil {
+		// TODO JSON ERROR STATUS
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	if err := cc.Db.Save(&thanksEmail).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return

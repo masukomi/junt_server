@@ -18,10 +18,19 @@ func (cc *InterviewsController) Create(w rest.ResponseWriter,
 
 	interview := models.Interview{}
 	if err := r.DecodeJsonPayload(&interview); err != nil {
+		// TODO JSON ERROR STATUS
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if err := interview.ConvertIdsToPeople(cc.Db); err != nil {
+		// TODO JSON ERROR STATUS
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	if err := cc.Db.Save(&interview).Error; err != nil {
+		// TODO JSON ERROR STATUS
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
