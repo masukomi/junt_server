@@ -136,12 +136,13 @@ func (i *Impl) InitSchema() {
 	// will NOT change existing column's type or delete unused columns
 	i.DB.AutoMigrate(
 		&models.Company{},
+		&models.Job{},
+		&models.Person{},
+		// events ....
 		&models.Followup{},
 		&models.Homework{},
 		&models.Interview{},
-		&models.Job{},
 		&models.Offer{},
-		&models.Person{},
 		&models.StatusChange{},
 		&models.ThanksEmail{},
 	)
