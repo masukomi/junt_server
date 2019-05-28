@@ -13,7 +13,10 @@ import (
 	// if this wasn't a go module
 	// we would import with "./models"
 	"masukomi.org/junt/controllers"
+	"strconv"
 )
+
+const DEFAULT_PORT = 8123
 
 func main() {
 	ensureConfigDir()
@@ -100,7 +103,7 @@ func main() {
 		log.Fatal(err)
 	}
 	api.SetApp(router)
-	log.Fatal(http.ListenAndServe(":8123", api.MakeHandler()))
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(DEFAULT_PORT), api.MakeHandler()))
 }
 
 func configDirPath() string {
