@@ -37,6 +37,7 @@ func main() {
 	router, err := rest.MakeRouter(
 		rest.Get("/companies", cc.ListAll),
 		rest.Get("/companies/:id", cc.FindById),
+		rest.Delete("/companies/:id", cc.Delete),
 		rest.Post("/companies", cc.Create),
 
 		// events is a read only endpoint

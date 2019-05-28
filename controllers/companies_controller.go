@@ -51,7 +51,8 @@ func (cc *CompaniesController) Delete(w rest.ResponseWriter,
 		rest.NotFound(w, r)
 		return
 	}
-	if err := cc.Db.Delete(&company).Error; err != nil {
+	success, err := company.HolisticDeletion(cc.Db)
+	if success {
 		w.WriteJson(map[string]string{"status": "SUCCESS"})
 		return
 	} else {
