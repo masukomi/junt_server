@@ -5,7 +5,7 @@ import (
 )
 
 type Interview struct {
-	Event
+	PeopleEvent
 	ScheduledAt time.Time `json:"scheduled_at"`
 	// generated if not supplied
 	Length int64 `json:"length"`

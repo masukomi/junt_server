@@ -1,6 +1,6 @@
 package models
 
 type ThanksEmail struct {
-	Event
+	PeopleEvent
 	People []Person `gorm:"many2many:people_thanks_emails;"` // has and belongs to many jobs
 }
