@@ -23,6 +23,17 @@ func main() {
 	i.InitSchema()
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
+	// api.Use(&rest.CorsMiddleware{
+	//     RejectNonCorsRequests: false,
+	//     OriginValidator: func(origin string, request *rest.Request) bool {
+	//         return origin == "http://my.other.host"
+	//     },
+	//     AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+	//     AllowedHeaders: []string{
+	//         "Accept", "Content-Type", "X-Custom-Header", "Origin"},
+	//     AccessControlAllowCredentials: true,
+	//     AccessControlMaxAge:           3600,
+	// })
 
 	cc := controllers.CompaniesController{i.DB}
 	pc := controllers.PeopleController{i.DB}
