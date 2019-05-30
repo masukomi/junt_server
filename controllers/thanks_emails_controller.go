@@ -73,11 +73,11 @@ func (cc *ThanksEmailsController) ListAll(w rest.ResponseWriter,
 	w.WriteJson(&thanksEmails)
 }
 
-func (tec *ThanksEmailController) Update(w rest.ResponseWriter, r *rest.Request) {
+func (tec *ThanksEmailsController) Update(w rest.ResponseWriter, r *rest.Request) {
 
 	id := r.PathParam("id")
-	thanksEmail := model.ThanksEmail{}
-	if tec.Db.First(&reminder, id).Error != nil {
+	thanksEmail := models.ThanksEmail{}
+	if tec.Db.First(&thanksEmail, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
