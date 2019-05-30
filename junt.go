@@ -39,82 +39,36 @@ func main() {
 	//     AccessControlMaxAge:           3600,
 	// })
 	crudThings := map[string]controllers.CrudController{
-		"companies":      controllers.CompaniesController{i.DB},
-		"people":         controllers.PeopleController{i.DB},
-		"followups":      controllers.FollowupsController{i.DB},
-		"homeworks":      controllers.HomeworksController{i.DB},
-		"interviews":     controllers.InterviewsController{i.DB},
-		"jobs":           controllers.JobsController{i.DB},
-		"offers":         controllers.OffersController{i.DB},
-		"status_changes": controllers.StatusChangesController{i.DB},
-		"thanks":         controllers.ThanksEmailsController{i.DB},
+		"companies":      &controllers.CompaniesController{i.DB},
+		"people":         &controllers.PeopleController{i.DB},
+		"followups":      &controllers.FollowupsController{i.DB},
+		"homeworks":      &controllers.HomeworksController{i.DB},
+		"interviews":     &controllers.InterviewsController{i.DB},
+		"jobs":           &controllers.JobsController{i.DB},
+		"offers":         &controllers.OffersController{i.DB},
+		"status_changes": &controllers.StatusChangesController{i.DB},
+		"thanks":         &controllers.ThanksEmailsController{i.DB},
 	}
 	ec := controllers.EventsController{i.DB}
-	makeRouterArgs := []Route{}
-	for path, controller := range crudThings {
+	makeRouterArgs := []*rest.Route{}
+	for name, controller := range crudThings {
 		makeRouterArgs = append(makeRouterArgs, rest.Get("/"+name, controller.ListAll))
 		makeRouterArgs = append(makeRouterArgs, rest.Get("/"+name+"/:id", controller.FindById))
 		makeRouterArgs = append(makeRouterArgs, rest.Post("/"+name, controller.Create))
-		makeRouterArgs = append(makeRouterArgs, rest.Delete("/"+name, controller.Update))
+		// TODO IMPLEMENT UPDATE
+		// makeRouterArgs = append(makeRouterArgs, rest.Delete("/"+name, controller.Update))
 	}
+
 	makeRouterArgs = append(makeRouterArgs, rest.Get("/events", ec.ListAll))
 	makeRouterArgs = append(makeRouterArgs, rest.Get("/events/job/:id", ec.ListAllForJob))
 
 	router, err := rest.MakeRouter(makeRouterArgs...)
-	// rest.Get("/companies", cc.ListAll),
-	// rest.Get("/companies/:id", cc.FindById),
-	// rest.Delete("/companies/:id", cc.Delete),
-	// rest.Post("/companies", cc.Create),
-
-	// events is a read only endpoint
-	// because it returns all structs that
-	// implement the IEvent interface
-
-	// rest.Get("/followups", fc.ListAll),
-	// rest.Get("/followups/:id", fc.FindById),
-	// rest.Delete("/followups/:id", fc.Delete),
-	// rest.Post("/followups", fc.Create),
-	//
-	// rest.Get("/homeworks", hc.ListAll),
-	// rest.Get("/homeworks/:id", hc.FindById),
-	// rest.Delete("/homeworks/:id", hc.Delete),
-	// rest.Post("/homeworks", hc.Create),
-	//
-	// rest.Get("/interviews", ic.ListAll),
-	// rest.Get("/interviews/:id", ic.FindById),
-	// rest.Delete("/interviews/:id", ic.Delete),
-	// rest.Post("/interviews", ic.Create),
-	//
-	// rest.Get("/jobs", jc.ListAll),
-	// rest.Get("/jobs/:id", jc.FindById),
-	// rest.Delete("/jobs/:id", jc.Delete),
-	// rest.Post("/jobs", jc.Create),
-	//
-	// rest.Get("/offers", oc.ListAll),
-	// rest.Get("/offers/:id", oc.FindById),
-	// rest.Delete("/offers/:id", oc.Delete),
-	// rest.Post("/offers", oc.Create),
-	//
-	// rest.Get("/people", pc.ListAll),
-	// rest.Get("/people/:id", pc.FindById),
-	// rest.Post("/people", pc.Create),
-	//
-	// rest.Get("/status_changes", sc.ListAll),
-	// rest.Get("/status_changes/:id", sc.FindById),
-	// rest.Delete("/status_changes/:id", sc.Delete),
-	// rest.Post("/status_changes", sc.Create),
-	//
-	// rest.Get("/thanks_emails", tc.ListAll),
-	// rest.Get("/thanks_emails/:id", tc.FindById),
-	// rest.Delete("/thanks_emails/:id", tc.Delete),
-	// rest.Post("/thanks_emails", tc.Create),
-	// )
 	if err != nil {
 		log.Fatal(err)
 	}
 	api.SetApp(router)
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(DEFAULT_PORT), api.MakeHandler()))
 	fmt.Println("Listening at http://localhost:" + strconv.Itoa(DEFAULT_PORT))
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(DEFAULT_PORT), api.MakeHandler()))
 
 }
 

@@ -9,6 +9,7 @@ type CrudController interface {
 	// READ...
 	ListAll(w rest.ResponseWriter, r *rest.Request)
 	FindById(w rest.ResponseWriter, r *rest.Request)
-	Update(w rest.ResponseWriter, r *rest.Request)
+	// TODO implement update
+	// Update(w rest.ResponseWriter, r *rest.Request)
 	Delete(w rest.ResponseWriter, r *rest.Request)
 }
