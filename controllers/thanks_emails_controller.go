@@ -84,13 +84,17 @@ func (tec *ThanksEmailsController) Update(w rest.ResponseWriter, r *rest.Request
 
 	// TODO decode into
 	var data map[string]interface{}
+
 	if err := r.DecodeJsonPayload(&data); err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// TODO for each key, copy over changes from data to thanksEmail
-	// TODO IF people_ids key is present call
-	//    thanksEmail.ConvertIdsToPeople(tec.Db)
+	if err := thanksEmail.UpdateFromJson(data, tec.Db); err != nil {
+		w.WriteJson(map[string]string{"status": "ERROR", "description": err.Error()})
+		rest.NotFound(w, r)
+		return
+
+	}
 
 	if err := tec.Db.Save(&thanksEmail).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
