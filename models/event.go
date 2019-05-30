@@ -26,7 +26,7 @@ type Event struct {
 
 	Note  string `sql:"type:text;" json:"note"` // markdown
 	JobId int64  `json:"job_id"`
-	Job   Job    `gorm:"foreignkey:JobId"`
+	Job   Job    `gorm:"foreignkey:JobId" json:"-"`
 }
 
 // implementing IEvent interface
