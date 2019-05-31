@@ -32,8 +32,8 @@ type Company struct {
 	Note      string    `sql:"type:text;" json:"note"` // markdown
 	CreatedAt time.Time `json:"created_at"`            // generated if not supplied
 	UpdatedAt time.Time `json:"updated_at"`            // generated if not supplied
-	Jobs      []Job     `gorm:"foreignkey:CompanyId`
-	People    []Person
+	Jobs      []Job     `json:"-" gorm:"foreignkey:CompanyId"`
+	People    []Person  `json:"-"`
 }
 
 func (c Company) HolisticDeletion(db *gorm.DB) (bool, error) {
