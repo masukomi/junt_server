@@ -33,13 +33,13 @@ type Person struct {
 	Name         string        `gorm:"index:people_names_idx" sql:"type:text;" json:"name"` // only required field
 	Email        string        `sql:"type:text;" json:"email"`
 	Phone        string        `sql:"type:text;" json:"phone"`
-	Note         string        `sql:"type:text;" json:"note"` // markdown
-	CompanyId    int64         // belongs_to Company
-	CreatedAt    time.Time     `json:"created_at"`             // generated if not supplied
-	UpdatedAt    time.Time     `json:"updated_at"`             // generated if not supplied
-	Jobs         []Job         `gorm:"many2many:jobs_people;"` // has and belongs to many jobs
-	Company      Company       `gorm:"gorm:foreignkey:CompanyId"`
-	ThanksEmails []ThanksEmail `gorm:"many2many:people_thanks_emails;"` // has and belongs to many jobs
+	Note         string        `sql:"type:text;" json:"note"`           // markdown
+	CompanyId    int64         `json:"-"`                               // belongs_to Company
+	CreatedAt    time.Time     `json:"created_at"`                      // generated if not supplied
+	UpdatedAt    time.Time     `json:"updated_at"`                      // generated if not supplied
+	Jobs         []Job         `json:"-" gorm:"many2many:jobs_people;"` // has and belongs to many jobs
+	Company      Company       `json:"-" gorm:"gorm:foreignkey:CompanyId"`
+	ThanksEmails []ThanksEmail `json:"-" gorm:"many2many:people_thanks_emails;"` // has and belongs to many jobs
 }
 
 func (p Person) HolisticDeletion(db *gorm.DB) (bool, error) {
