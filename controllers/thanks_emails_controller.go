@@ -73,6 +73,7 @@ func (cc *ThanksEmailsController) ListAll(w rest.ResponseWriter,
 	w.WriteJson(&thanksEmails)
 }
 
+// TODO: refactor me. I'm too big.
 func (tec *ThanksEmailsController) Update(w rest.ResponseWriter, r *rest.Request) {
 
 	id := r.PathParam("id")
