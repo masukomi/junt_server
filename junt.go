@@ -47,7 +47,7 @@ func main() {
 		"jobs":           &controllers.JobsController{i.DB},
 		"offers":         &controllers.OffersController{i.DB},
 		"status_changes": &controllers.StatusChangesController{i.DB},
-		"thanks":         &controllers.ThanksEmailsController{i.DB},
+		"thanks_emails":  &controllers.ThanksEmailsController{i.DB},
 	}
 	ec := controllers.EventsController{i.DB}
 	makeRouterArgs := []*rest.Route{}
