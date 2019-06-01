@@ -36,10 +36,11 @@ func (cc *CompaniesController) FindById(w rest.ResponseWriter,
 
 	id := r.PathParam("id")
 	company := models.Company{}
-	if cc.Db.First(&company, id).Error != nil {
+	if cc.Db.Preload("Jobs").Preload("People").First(&company, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
+	company.Db = cc.Db
 	w.WriteJson(&company)
 }
 
@@ -48,7 +49,7 @@ func (cc *CompaniesController) Delete(w rest.ResponseWriter,
 
 	id := r.PathParam("id")
 	company := models.Company{}
-	if cc.Db.First(&company, id).Error != nil {
+	if cc.Db.Preload("Jobs").Preload("People").First(&company, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
@@ -64,6 +65,6 @@ func (cc *CompaniesController) Delete(w rest.ResponseWriter,
 func (cc *CompaniesController) ListAll(w rest.ResponseWriter,
 	r *rest.Request) {
 	companies := []models.Company{}
-	cc.Db.Find(&companies)
+	cc.Db.Preload("Jobs").Preload("People").Find(&companies)
 	w.WriteJson(&companies)
 }

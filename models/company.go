@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
@@ -35,6 +36,7 @@ type Company struct {
 	UpdatedAt time.Time `json:"updated_at"`            // generated if not supplied
 	Jobs      []Job     `json:"-" gorm:"foreignkey:CompanyId"`
 	People    []Person  `json:"-"`
+	Db        *gorm.DB  `json:"-" gorm:"-"`
 }
 
 func (c Company) HolisticDeletion(db *gorm.DB) (bool, error) {
@@ -66,8 +68,10 @@ func (c Company) HolisticDeletion(db *gorm.DB) (bool, error) {
 }
 
 func (c *Company) MarshalJSON() ([]byte, error) {
-	jobIds := make([]int64, len(c.Jobs))
-	for idx, job := range c.Jobs {
+	jobs := c.Jobs
+	jobIds := make([]int64, len(jobs))
+	fmt.Printf("Company.Jobs len: %v\n", len(jobs))
+	for idx, job := range jobs {
 		jobIds[idx] = job.Id
 	}
 	type Alias Company
