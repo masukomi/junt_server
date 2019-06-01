@@ -57,6 +57,7 @@ func main() {
 		makeRouterArgs = append(makeRouterArgs, rest.Post("/"+name, controller.Create))
 		// TODO IMPLEMENT UPDATE
 		// makeRouterArgs = append(makeRouterArgs, rest.Delete("/"+name, controller.Update))
+		makeRouterArgs = append(makeRouterArgs, rest.Delete("/"+name+"/:id", controller.Delete))
 	}
 
 	makeRouterArgs = append(makeRouterArgs, rest.Get("/events", ec.ListAll))
