@@ -34,7 +34,7 @@ type Person struct {
 	Email        string        `sql:"type:text;" json:"email"`
 	Phone        string        `sql:"type:text;" json:"phone"`
 	Note         string        `sql:"type:text;" json:"note"`           // markdown
-	CompanyId    int64         `json:"-"`                               // belongs_to Company
+	CompanyId    int64         `json:"company_id"`                      // belongs_to Company
 	CreatedAt    time.Time     `json:"created_at"`                      // generated if not supplied
 	UpdatedAt    time.Time     `json:"updated_at"`                      // generated if not supplied
 	Jobs         []Job         `json:"-" gorm:"many2many:jobs_people;"` // has and belongs to many jobs
