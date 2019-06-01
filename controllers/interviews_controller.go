@@ -75,3 +75,32 @@ func (cc *InterviewsController) Delete(w rest.ResponseWriter,
 	}
 
 }
+func (ic *InterviewsController) Update(w rest.ResponseWriter, r *rest.Request) {
+
+	id := r.PathParam("id")
+	interview := models.Interview{}
+	if ic.Db.First(&interview, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+
+	// TODO decode into
+	var data map[string]interface{}
+
+	if err := r.DecodeJsonPayload(&data); err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := interview.UpdateFromJson(data, ic.Db); err != nil {
+		w.WriteJson(map[string]string{"status": "ERROR", "description": err.Error()})
+		rest.Error(w, "JSON didn't meet API expectations", http.StatusUnprocessableEntity)
+		return
+
+	}
+
+	if err := ic.Db.Save(&interview).Error; err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteJson(map[string]string{"status": "SUCCESS"})
+}
