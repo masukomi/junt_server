@@ -10,6 +10,7 @@ import (
 )
 
 type JobsController struct {
+	CrudControllerImpl
 	Db *gorm.DB
 }
 

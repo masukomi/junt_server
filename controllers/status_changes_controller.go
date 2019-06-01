@@ -10,6 +10,7 @@ import (
 )
 
 type StatusChangesController struct {
+	CrudControllerImpl
 	Db *gorm.DB
 }
 

@@ -1,11 +1,8 @@
 package models
 
 import (
-	"errors"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"strconv"
-	"time"
 )
 
 type ThanksEmail struct {

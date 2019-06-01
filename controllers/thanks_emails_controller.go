@@ -10,6 +10,7 @@ import (
 )
 
 type ThanksEmailsController struct {
+	CrudControllerImpl
 	Db *gorm.DB
 }
 

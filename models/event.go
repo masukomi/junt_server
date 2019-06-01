@@ -1,8 +1,10 @@
 package models
 
 import (
+	"errors"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"strconv"
 	"time"
 )
 
@@ -54,27 +56,28 @@ func (e *Event) UpdateEventFromJson(data map[string]interface{}, db *gorm.DB) er
 		case "created_at":
 			newTime, err := time.Parse(time.RFC3339, value.(string))
 			if err != nil {
-				pe.CreatedAt = newTime
+				e.CreatedAt = newTime
 			} else {
 				return errors.New("invalid created_at time: \"" + value.(string) + "\" Use RFC3339")
 			}
 		case "updated_at":
 			newTime, err := time.Parse(time.RFC3339, value.(string))
 			if err != nil {
-				pe.UpdatedAt = newTime
+				e.UpdatedAt = newTime
 			} else {
 				return errors.New("invalid created_at time: \"" + value.(string) + "\" Use RFC3339")
 			}
 		case "note":
-			pe.Note = value.(string)
+			e.Note = value.(string)
 		case "job_id":
-			pe.JobId = int64(value.(float64))
+			e.JobId = int64(value.(float64))
 			job := Job{}
 			if db.First(&job, value).Error != nil {
-				return errors.New("invalid associated job_id: " + strconv.FormatInt(pe.JobId, 10))
+				return errors.New("invalid associated job_id: " + strconv.FormatInt(e.JobId, 10))
 				// why can I convert from an int with Itoa but not an int64?
 			}
-			pe.Job = job
+			e.Job = job
 		}
 	}
+	return nil
 }

@@ -11,6 +11,7 @@ import (
 
 type CompaniesController struct {
 	Db *gorm.DB
+	CrudControllerImpl
 }
 
 func (cc *CompaniesController) Create(w rest.ResponseWriter,

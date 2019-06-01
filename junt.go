@@ -39,15 +39,15 @@ func main() {
 	//     AccessControlMaxAge:           3600,
 	// })
 	crudThings := map[string]controllers.CrudController{
-		"companies":      &controllers.CompaniesController{i.DB},
-		"people":         &controllers.PeopleController{i.DB},
-		"followups":      &controllers.FollowupsController{i.DB},
-		"homeworks":      &controllers.HomeworksController{i.DB},
-		"interviews":     &controllers.InterviewsController{i.DB},
-		"jobs":           &controllers.JobsController{i.DB},
-		"offers":         &controllers.OffersController{i.DB},
-		"status_changes": &controllers.StatusChangesController{i.DB},
-		"thanks_emails":  &controllers.ThanksEmailsController{i.DB},
+		"companies":      &controllers.CompaniesController{Db: i.DB},
+		"people":         &controllers.PeopleController{Db: i.DB},
+		"followups":      &controllers.FollowupsController{Db: i.DB},
+		"homeworks":      &controllers.HomeworksController{Db: i.DB},
+		"interviews":     &controllers.InterviewsController{Db: i.DB},
+		"jobs":           &controllers.JobsController{Db: i.DB},
+		"offers":         &controllers.OffersController{Db: i.DB},
+		"status_changes": &controllers.StatusChangesController{Db: i.DB},
+		"thanks_emails":  &controllers.ThanksEmailsController{Db: i.DB},
 	}
 	ec := controllers.EventsController{i.DB}
 	makeRouterArgs := []*rest.Route{}

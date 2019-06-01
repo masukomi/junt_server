@@ -10,6 +10,7 @@ import (
 )
 
 type OffersController struct {
+	CrudControllerImpl
 	Db *gorm.DB
 }
 

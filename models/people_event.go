@@ -2,9 +2,9 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"time"
 )
 
 type PeopleEvent struct {
@@ -53,7 +53,7 @@ func (pe *PeopleEvent) ConvertIdsToPeople(db *gorm.DB) error {
 	return nil
 }
 func (pe *PeopleEvent) UpdatePeopleEventFromJson(data map[string]interface{}, db *gorm.DB) error {
-	if err = pe.UpdateEventFromJson(data, db); err != nil {
+	if err := pe.UpdateEventFromJson(data, db); err != nil {
 		return err
 	}
 	value, ok := data["person_ids"]

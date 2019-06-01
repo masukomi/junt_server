@@ -10,6 +10,7 @@ import (
 )
 
 type InterviewsController struct {
+	CrudControllerImpl
 	Db *gorm.DB
 }
 

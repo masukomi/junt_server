@@ -1,6 +1,9 @@
 package models
 
 import (
+	"errors"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
 )
 
@@ -20,7 +23,7 @@ type Interview struct {
 
 func (i *Interview) UpdateFromJson(data map[string]interface{}, db *gorm.DB) error {
 
-	if err = i.UpdatePeopleEventFromJson(data, db); err != nil {
+	if err := i.UpdatePeopleEventFromJson(data, db); err != nil {
 		return err
 	}
 	// also has...
@@ -48,4 +51,5 @@ func (i *Interview) UpdateFromJson(data map[string]interface{}, db *gorm.DB) err
 		}
 	}
 
+	return nil
 }

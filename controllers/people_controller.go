@@ -10,6 +10,7 @@ import (
 )
 
 type PeopleController struct {
+	CrudControllerImpl
 	Db *gorm.DB
 }
 

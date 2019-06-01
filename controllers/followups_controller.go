@@ -10,6 +10,7 @@ import (
 )
 
 type FollowupsController struct {
+	CrudControllerImpl
 	Db *gorm.DB
 }
 
@@ -71,5 +72,17 @@ func (cc *FollowupsController) Delete(w rest.ResponseWriter,
 	} else {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+}
+
+func (fc *FollowupsController) Update(w rest.ResponseWriter, r *rest.Request) {
+
+	id := r.PathParam("id")
+	followup := models.Followup{}
+	if fc.Db.First(&followup, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	fc.UpdateModel(&followup, fc.Db, w, r)
 
 }

@@ -10,6 +10,7 @@ import (
 )
 
 type HomeworksController struct {
+	CrudControllerImpl
 	Db *gorm.DB
 }
 
