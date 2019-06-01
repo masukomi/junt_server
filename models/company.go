@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
@@ -62,4 +63,19 @@ func (c Company) HolisticDeletion(db *gorm.DB) (bool, error) {
 		transaction.Rollback()
 		return false, err
 	}
+}
+
+func (c *Company) MarshalJSON() ([]byte, error) {
+	jobIds := make([]int64, len(c.Jobs))
+	for idx, job := range c.Jobs {
+		jobIds[idx] = job.Id
+	}
+	type Alias Company
+	return json.Marshal(&struct {
+		JobIds []int64 `json:"job_ids"`
+		*Alias
+	}{
+		JobIds: jobIds,
+		Alias:  (*Alias)(c),
+	})
 }

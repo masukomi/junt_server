@@ -53,14 +53,19 @@ func main() {
 	makeRouterArgs := []*rest.Route{}
 	for name, controller := range crudThings {
 		makeRouterArgs = append(makeRouterArgs, rest.Get("/"+name, controller.ListAll))
+		// ... and with trailing slash
+		makeRouterArgs = append(makeRouterArgs, rest.Get("/"+name+"/", controller.ListAll))
 		makeRouterArgs = append(makeRouterArgs, rest.Get("/"+name+"/:id", controller.FindById))
 		makeRouterArgs = append(makeRouterArgs, rest.Post("/"+name, controller.Create))
+		// ... and with trailing slash
+		makeRouterArgs = append(makeRouterArgs, rest.Post("/"+name+"/", controller.Create))
 		// TODO IMPLEMENT UPDATE
 		// makeRouterArgs = append(makeRouterArgs, rest.Delete("/"+name, controller.Update))
 		makeRouterArgs = append(makeRouterArgs, rest.Delete("/"+name+"/:id", controller.Delete))
 	}
 
 	makeRouterArgs = append(makeRouterArgs, rest.Get("/events", ec.ListAll))
+	makeRouterArgs = append(makeRouterArgs, rest.Get("/events/", ec.ListAll))
 	makeRouterArgs = append(makeRouterArgs, rest.Get("/events/job/:id", ec.ListAllForJob))
 
 	router, err := rest.MakeRouter(makeRouterArgs...)
