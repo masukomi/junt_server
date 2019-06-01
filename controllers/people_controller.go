@@ -36,7 +36,7 @@ func (cc *PeopleController) FindById(w rest.ResponseWriter,
 
 	id := r.PathParam("id")
 	person := models.Person{}
-	if cc.Db.First(&person, id).Error != nil {
+	if cc.Db.Preload("Jobs").First(&person, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
@@ -46,7 +46,7 @@ func (cc *PeopleController) FindById(w rest.ResponseWriter,
 func (cc *PeopleController) ListAll(w rest.ResponseWriter,
 	r *rest.Request) {
 	people := []models.Person{}
-	cc.Db.Find(&people)
+	cc.Db.Preload("Jobs").Find(&people)
 	w.WriteJson(&people)
 }
 
