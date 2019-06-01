@@ -17,3 +17,35 @@ type Interview struct {
 	People []Person `gorm:"many2many:interviews_people;"`
 	// has and belongs to many jobs
 }
+
+func (i *Interview) UpdateFromJson(data map[string]interface{}, db *gorm.DB) error {
+
+	if err = i.UpdatePeopleEventFromJson(data, db); err != nil {
+		return err
+	}
+	// also has...
+	// scheduled_at: date_time
+	// length:       int
+	// 			  (minutes)
+	// rating:       string enum
+	// 			  (emoji suggested)
+	// type:         string enum
+	for key, value := range data {
+		switch key {
+		case "scheduled_at":
+			newTime, err := time.Parse(time.RFC3339, value.(string))
+			if err != nil {
+				i.ScheduledAt = newTime
+			} else {
+				return errors.New("invalid scheduled_at time: \"" + value.(string) + "\" Use RFC3339")
+			}
+		case "length":
+			i.Length = int64(value.(float64))
+		case "rating":
+			i.Rating = value.(string)
+		case "type":
+			i.Type = value.(string)
+		}
+	}
+
+}
