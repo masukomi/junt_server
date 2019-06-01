@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"reflect"
 	"sort"
 	"time"
 )
@@ -55,9 +56,14 @@ func GetIEvents(db *gorm.DB, jobIds ...int64) ([]IEvent, error) {
 	db.Where(whereClause).Find(&offers)
 	db.Where(whereClause).Find(&statusChanges)
 	db.Where(whereClause).Find(&thanksEmails)
-	db.Where(whereClause).Find(&thanksEmails)
 
-	iEvents := GroupRandomIEvents(followups,
+	size := len(followups) +
+		len(homeworks) +
+		len(interviews) +
+		len(offers) +
+		len(statusChanges) +
+		len(thanksEmails)
+	iEvents := GroupRandomIEvents(size, followups,
 		homeworks,
 		interviews,
 		offers,
@@ -68,6 +74,25 @@ func GetIEvents(db *gorm.DB, jobIds ...int64) ([]IEvent, error) {
 	sort.Sort(ByCreationDate(iEvents))
 	return iEvents, nil
 }
+func GroupRandomIEvents(size int, iEventsSlices ...interface{}) []IEvent {
+	response := make([]IEvent, size)
+	counter := 0
+	for _, currentSlice := range iEventsSlices {
+		// each element of iEvents is itself a slice
+		// for _, event := range currentSlice.([]interface{}) {
+		// 	response[idx] = event.(IEvent)
+		// 	idx++
+		// }
+		s := reflect.ValueOf(currentSlice)
+
+		for i := 0; i < s.Len(); i++ {
+			response[counter] = s.Index(i).Interface().(IEvent)
+			counter++
+		}
+	}
+
+	return response
+}
 func GenerateIEventWhereClause(jobIds ...int64) string {
 	if len(jobIds) > 0 {
 		return fmt.Sprintf("where job_id = %v", jobIds[0])
@@ -76,22 +101,4 @@ func GenerateIEventWhereClause(jobIds ...int64) string {
 	} else {
 		return "where true"
 	}
-}
-
-func GroupRandomIEvents(iEvents ...interface{}) []IEvent {
-	size := 0
-	for _, x := range iEvents {
-		size += len(x.([]IEvent))
-	}
-	response := make([]IEvent, size)
-	idx := 0
-	for _, currentSlice := range iEvents {
-		// each element of iEvents is itself a slice
-		for _, event := range currentSlice.([]IEvent) {
-			response[idx] = event //.(IEvent)
-			idx++
-		}
-	}
-
-	return response
 }
