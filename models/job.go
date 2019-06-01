@@ -66,7 +66,7 @@ func (j Job) transactionableHolisticDeletion(db *gorm.DB, transaction *gorm.DB) 
 		}
 	}
 	// delete the job
-	if err := db.Delete(&j).Error; err != nil {
+	if err := db.Delete(&j).Error; err == nil {
 		if transaction != nil {
 			transaction.Commit()
 		}

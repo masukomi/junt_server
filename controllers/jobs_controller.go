@@ -63,6 +63,7 @@ func (cc *JobsController) Delete(w rest.ResponseWriter,
 	if success {
 		w.WriteJson(map[string]string{"status": "SUCCESS"})
 	} else {
-		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		w.WriteJson(map[string]string{"status": "ERROR",
+			"description": err.Error()})
 	}
 }
