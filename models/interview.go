@@ -17,7 +17,7 @@ type Interview struct {
 	// emoji
 	Type string `sql:"type:text;" json:"type"`
 	// string enum (user created)
-	People []Person `gorm:"many2many:interviews_people;"`
+	People []Person `json:"-" gorm:"many2many:interviews_people;"`
 	// has and belongs to many jobs
 }
 
