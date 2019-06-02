@@ -255,6 +255,8 @@ describe 'Junt' do
         job_id: :int,
         note: :string_or_null,
         person_ids: :array_of_ints,
+        created_at: :date,
+        updated_at: :date
       )
     end
     it "should be able to show a homework" do
@@ -264,7 +266,9 @@ describe 'Junt' do
         id: :int,
         job_id: :int,
         note: :string_or_null,
-        due_date: :date
+        due_date: :date,
+        created_at: :date,
+        updated_at: :date
       )
     end
     it "should be able to show a interview" do
@@ -278,7 +282,46 @@ describe 'Junt' do
         scheduled_at: :date,
         length: :int_or_null,
         rating: :string_or_null,
-        type: :string_or_null
+        type: :string_or_null,
+        created_at: :date,
+        updated_at: :date
+      )
+    end
+    it "should be able to show an offer" do
+      get "#{@@base_url}/offers/#{@@offer_1_id}"
+      expect_status(200)
+      expect_json_types(
+        id: :int,
+        job_id: :int,
+        note: :string_or_null,
+        status: :string,
+        created_at: :date,
+        updated_at: :date
+      )
+    end
+    it "should be able to show an status_change" do
+      get "#{@@base_url}/status_changes/#{@@status_change_1_id}"
+      expect_status(200)
+      expect_json_types(
+        id: :int,
+        job_id: :int,
+        note: :string_or_null,
+        from: :string,
+        to: :string,
+        created_at: :date,
+        updated_at: :date
+      )
+    end
+    it "should be able to show a thanks_email" do
+      get "#{@@base_url}/thanks_emails/#{@@thanks_email_1_id}"
+      expect_status(200)
+      expect_json_types(
+        id: :int,
+        job_id: :int,
+        note: :string_or_null,
+        person_ids: :array_of_ints,
+        created_at: :date,
+        updated_at: :date
       )
     end
 
