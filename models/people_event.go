@@ -9,8 +9,8 @@ import (
 
 type PeopleEvent struct {
 	Event
-	People    []Person
-	PersonIds []int64 `gorm:"-"`
+	People    []Person `json:"-"`
+	PersonIds []int64  `json:"person_ids" gorm:"-"`
 }
 
 func (pe *PeopleEvent) GetPersonIds() []int64 {
@@ -27,14 +27,14 @@ func (pe *PeopleEvent) GetPersonIds() []int64 {
 // THEN call ConvertIdsToPeople
 
 func (pe *PeopleEvent) MarshalJSON() ([]byte, error) {
-	person_ids := pe.GetPersonIds()
+	personIds := pe.GetPersonIds()
 	type Alias PeopleEvent
 	return json.Marshal(&struct {
 		PersonIds []int64 `json:"person_ids"`
 		*Alias
 	}{
 		Alias:     (*Alias)(pe),
-		PersonIds: person_ids,
+		PersonIds: personIds,
 	})
 }
 func (pe *PeopleEvent) SetPeople(peeps []Person) {
