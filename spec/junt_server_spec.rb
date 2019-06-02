@@ -80,6 +80,7 @@ describe 'Junt' do
         note: "test co has 100% coverage"
       }
       post "#{@base_url}/companies", new_company_json, @default_headers
+      expect_status(200)
       expect_json_types(status: :string, id: :int)
       expect(json_body[:status]).to(eq("SUCCESS"))
       @company_1_id = json_body[:id]
@@ -97,6 +98,7 @@ describe 'Junt' do
         start_date: nil
       }
       post "#{@base_url}/jobs", new_job_json, @default_headers
+      expect_status(200)
       expect_json_types(status: :string, id: :int)
       expect(json_body[:status]).to(eq("SUCCESS"))
       @job_1_id = json_body[:id]
@@ -109,9 +111,87 @@ describe 'Junt' do
         note: 'another _markdown_ note',
       }
       post "#{@base_url}/people", new_person_json, @default_headers
+      expect_status(200)
       expect_json_types(status: :string, id: :int)
       expect(json_body[:status]).to(eq("SUCCESS"))
       @person_1_id = json_body[:id]
+    end
+    describe "of events" do
+      it "should be able to create a new followup" do
+        new_followup_json = {
+          job_id: @job_1_id,
+          person_ids: [@person_1_id],
+          note: "a _markdown_ note"
+        }
+        post "#{@base_url}/followups", new_followup_json, @default_headers
+        expect_status(200)
+        expect_json_types(status: :string, id: :int)
+        expect(json_body[:status]).to(eq("SUCCESS"))
+        @followup_1_id = json_body[:id]
+      end
+      it "should be able to create a new homework" do
+        new_homework_json = {
+          job_id: @job_1_id,
+          due_date: "2019-06-02T18:47:44+00:00",
+          note: "a _markdown_ note"
+        }
+        post "#{@base_url}/homeworks", new_homework_json, @default_headers
+        expect_status(200)
+        expect_json_types(status: :string, id: :int)
+        expect(json_body[:status]).to(eq("SUCCESS"))
+        @homework_1_id = json_body[:id]
+      end
+      it "should be able to create a new interview" do
+        new_interview_json = {
+          job_id: @job_1_id,
+          person_ids: [@person_1_id],
+          note: "a _markdown_ note"
+        }
+        post "#{@base_url}/interviews", new_interview_json, @default_headers
+        expect_status(200)
+        expect_json_types(status: :string, id: :int)
+        expect(json_body[:status]).to(eq("SUCCESS"))
+        @interview_1_id = json_body[:id]
+      end
+      it "should be able to create a new offer" do
+        new_offer_json = {
+          job_id: @job_1_id,
+          status: "received",
+          note: "a _markdown_ note"
+        }
+        post "#{@base_url}/offers", new_offer_json, @default_headers
+        expect_status(200)
+        expect_json_types(status: :string, id: :int)
+        expect(json_body[:status]).to(eq("SUCCESS"))
+        @offer_1_id = json_body[:id]
+      end
+      it "should be able to create a new status_change" do
+        new_status_change_json = {
+          job_id: @job_1_id,
+          from: nil, 
+          # initial status change for a job should be nil->something
+          to: "applied",
+          note: "a _markdown_ note"
+        }
+        post "#{@base_url}/status_changes", new_status_change_json, @default_headers
+        expect_status(200)
+        expect_json_types(status: :string, id: :int)
+        expect(json_body[:status]).to(eq("SUCCESS"))
+        @status_change_1_id = json_body[:id]
+      end
+      it "should be able to create a new thanks_email" do
+        new_thanks_email_json = {
+          job_id: @job_1_id,
+          person_ids: [@person_1_id],
+          note: "a _markdown_ note" 
+        }
+        post "#{@base_url}/thanks_emails", new_thanks_email_json, @default_headers
+        expect_status(200)
+        expect_json_types(status: :string, id: :int)
+        expect(json_body[:status]).to(eq("SUCCESS"))
+        @thanks_email_1_id = json_body[:id]
+      end
+
     end
     
   end
@@ -120,5 +200,6 @@ describe 'Junt' do
   # describe "associations"
     # new job with person_ids
     # new person with job_id
-
+    # each event with job
+    # thanks_emails, followups, and interviews with person_ids
 end
