@@ -98,6 +98,7 @@ func (i *Impl) InitDB() {
 	dbPath := filepath.Join(configDirPath(), "junt.db")
 	envDbPath, present := os.LookupEnv("JUNT_DB")
 	if present {
+		fmt.Println("Using custom db path: ", envDbPath)
 		dbPath = envDbPath
 	}
 	i.DB, err = gorm.Open("sqlite3", dbPath)
