@@ -29,19 +29,59 @@ describe 'Junt' do
     # remove the test db
     `rm #{ENV['JUNT_DB']}`
   end
-  it "should initially have no companies" do
-    get "#{@base_url}/companies" # should return empty array
-    expect(json_body.size).to(eq(0))
+  describe "initial lists" do
+    it "should initially have no companies" do
+      get "#{@base_url}/companies" # should return empty array
+      expect(json_body.size).to(eq(0))
+    end
+    it "should initially have no events" do
+      get "#{@base_url}/events" # should return empty array
+      expect(json_body.size).to(eq(0))
+    end
+    it "should initially have no followups" do
+      get "#{@base_url}/followups" # should return empty array
+      expect(json_body.size).to(eq(0))
+    end
+    it "should initially have no homeworks" do
+      get "#{@base_url}/homeworks" # should return empty array
+      expect(json_body.size).to(eq(0))
+    end
+    it "should initially have no interviews" do
+      get "#{@base_url}/interviews" # should return empty array
+      expect(json_body.size).to(eq(0))
+    end
+    it "should initially have no jobs" do
+      get "#{@base_url}/jobs" # should return empty array
+      expect(json_body.size).to(eq(0))
+    end
+    it "should initially have no offers" do
+      get "#{@base_url}/offers" # should return empty array
+      expect(json_body.size).to(eq(0))
+    end
+    it "should initially have no people" do
+      get "#{@base_url}/people" # should return empty array
+      expect(json_body.size).to(eq(0))
+    end
+    it "should initially have no status_changes" do
+      get "#{@base_url}/status_changes" # should return empty array
+      expect(json_body.size).to(eq(0))
+    end
+    it "should initially have no thanks_emails" do
+      get "#{@base_url}/thanks_emails" # should return empty array
+      expect(json_body.size).to(eq(0))
+    end
   end
-  it "should be able to create a company" do
-    new_company_json = {
-      name: "test co",
-      location: "somewhere nice",
-      url: "https://example.com/test_co",
-      note: "test co has 100% coverage"
-    }
-    post "#{@base_url}/companies", new_company_json, @default_headers
-    expect_json_types(status: :string, id: :int)
-    expect(json_body[:status]).to(eq("SUCCESS"))
+  describe "creation" do
+    it "should be able to create a company" do
+      new_company_json = {
+        name: "test co",
+        location: "somewhere nice",
+        url: "https://example.com/test_co",
+        note: "test co has 100% coverage"
+      }
+      post "#{@base_url}/companies", new_company_json, @default_headers
+      expect_json_types(status: :string, id: :int)
+      expect(json_body[:status]).to(eq("SUCCESS"))
+    end
   end
 end
