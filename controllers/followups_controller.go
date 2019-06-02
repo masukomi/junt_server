@@ -53,7 +53,7 @@ func (cc *FollowupsController) FindById(w rest.ResponseWriter,
 func (cc *FollowupsController) ListAll(w rest.ResponseWriter,
 	r *rest.Request) {
 	followups := []models.Followup{}
-	cc.Db.Find(&followups)
+	cc.Db.Preload("People").Find(&followups)
 	w.WriteJson(&followups)
 }
 
@@ -79,7 +79,7 @@ func (fc *FollowupsController) Update(w rest.ResponseWriter, r *rest.Request) {
 
 	id := r.PathParam("id")
 	followup := models.Followup{}
-	if fc.Db.First(&followup, id).Error != nil {
+	if fc.Db.Preload("People").First(&followup, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}

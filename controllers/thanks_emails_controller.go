@@ -43,7 +43,7 @@ func (cc *ThanksEmailsController) FindById(w rest.ResponseWriter,
 
 	id := r.PathParam("id")
 	thanksEmail := models.ThanksEmail{}
-	if cc.Db.First(&thanksEmail, id).Error != nil {
+	if cc.Db.Preload("People").First(&thanksEmail, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
@@ -70,7 +70,7 @@ func (cc *ThanksEmailsController) Delete(w rest.ResponseWriter,
 func (cc *ThanksEmailsController) ListAll(w rest.ResponseWriter,
 	r *rest.Request) {
 	thanksEmails := []models.ThanksEmail{}
-	cc.Db.Find(&thanksEmails)
+	cc.Db.Preload("People").Find(&thanksEmails)
 	w.WriteJson(&thanksEmails)
 }
 
