@@ -82,6 +82,43 @@ describe 'Junt' do
       post "#{@base_url}/companies", new_company_json, @default_headers
       expect_json_types(status: :string, id: :int)
       expect(json_body[:status]).to(eq("SUCCESS"))
+      @company_1_id = json_body[:id]
     end
+    it "should be able to create a job" do
+      new_job_json = {
+        company_id: @company_1_id,
+        job_title: "chief tester",
+        posting_url: "https://example.com/test_co/chief_tester_job",
+        source: "we work remotely",
+        referred_by: "nobody",
+        salary_range: "unknown",
+        application_method: "online",
+        note: "a _markdown_ note",
+        start_date: nil
+      }
+      post "#{@base_url}/jobs", new_job_json, @default_headers
+      expect_json_types(status: :string, id: :int)
+      expect(json_body[:status]).to(eq("SUCCESS"))
+      @job_1_id = json_body[:id]
+    end
+    it "should be able to create a new person" do
+      new_person_json = {
+        name: "mary smith",
+        email: 'msmith@example.com',
+        phone: '+1 555-555-5555',
+        note: 'another _markdown_ note',
+      }
+      post "#{@base_url}/people", new_person_json, @default_headers
+      expect_json_types(status: :string, id: :int)
+      expect(json_body[:status]).to(eq("SUCCESS"))
+      @person_1_id = json_body[:id]
+    end
+    
   end
+
+  ## TODO 
+  # describe "associations"
+    # new job with person_ids
+    # new person with job_id
+
 end
