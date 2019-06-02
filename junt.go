@@ -96,11 +96,11 @@ type Impl struct {
 func (i *Impl) InitDB() {
 	var err error
 	dbPath := filepath.Join(configDirPath(), "junt.db")
-	envDbPath, present := os.LookupEnv("JUNT_DB")
-	if present {
-		fmt.Println("Using custom db path: ", envDbPath)
+	envDbPath, envDbPathPresent := os.LookupEnv("JUNT_DB")
+	if envDbPathPresent {
 		dbPath = envDbPath
 	}
+	fmt.Println("Using database at: ", dbPath)
 	i.DB, err = gorm.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatalf("Got error when connecting to database: '%v'", err)
