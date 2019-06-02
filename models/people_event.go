@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -26,17 +25,18 @@ func (pe *PeopleEvent) GetPersonIds() []int64 {
 // NOTE: unmarshall via normal means
 // THEN call ConvertIdsToPeople
 
-func (pe *PeopleEvent) MarshalJSON() ([]byte, error) {
-	personIds := pe.GetPersonIds()
-	type Alias PeopleEvent
-	return json.Marshal(&struct {
-		PersonIds []int64 `json:"person_ids"`
-		*Alias
-	}{
-		Alias:     (*Alias)(pe),
-		PersonIds: personIds,
-	})
-}
+// func (pe *PeopleEvent) MarshalJSON() ([]byte, error) {
+// 	fmt.Println("XXXXX in PeopleEvent#MarshalJSON")
+// 	personIds := pe.GetPersonIds()
+// 	type Alias PeopleEvent
+// 	return json.Marshal(&struct {
+// 		PersonIds []int64 `json:"person_ids"`
+// 		*Alias
+// 	}{
+// 		Alias:     (*Alias)(pe),
+// 		PersonIds: personIds,
+// 	})
+// }
 func (pe *PeopleEvent) SetPeople(peeps []Person) {
 	pe.People = peeps
 }

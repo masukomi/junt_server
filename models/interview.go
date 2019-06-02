@@ -1,7 +1,9 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
@@ -52,4 +54,15 @@ func (i *Interview) UpdateFromJson(data map[string]interface{}, db *gorm.DB) err
 	}
 
 	return nil
+}
+func (i *Interview) MarshalJSON() ([]byte, error) {
+	personIds := i.GetPersonIds()
+	type Alias Interview
+	return json.Marshal(&struct {
+		PersonIds []int64 `json:"person_ids"`
+		*Alias
+	}{
+		Alias:     (*Alias)(i),
+		PersonIds: personIds,
+	})
 }
