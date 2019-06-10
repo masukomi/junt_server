@@ -1,15 +1,15 @@
 package main
 
 import (
-	"log"
-	"net/http"
-	"os"
-	"path/filepath"
-
+	"errors"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"log"
 	"masukomi.org/junt/models"
+	"net/http"
+	"os"
+	"path/filepath"
 	// if this wasn't a go module
 	// we would import with "./models"
 	"fmt"

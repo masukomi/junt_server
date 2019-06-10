@@ -70,3 +70,44 @@ func (pe *PeopleEvent) UpdatePeopleEventFromJson(data map[string]interface{}, db
 	// if not ok, no worries. they weren't updating that association
 	return nil
 }
+func GetPersonEvents(db *gorm.DB, personIds ...int64) ([]IEvent, error) {
+	if len(personIds) > 1 {
+		return []IEvent{}, errors.New("maximum of one person per request")
+	}
+
+	// TODO: figure out some way to
+	// make this less... manual
+	followups := []Followup{}
+	interviews := []Interview{}
+	thanksEmails := []ThanksEmail{}
+
+	whereClause := GenerateIEventWhereClause(personIds...)
+	// db.Where("job_id = ?", job_id).Find(&homeworks)
+	db.Preload("People").Where(whereClause).Find(&followups)
+	db.Preload("People").Where(whereClause).Find(&interviews)
+	db.Preload("People").Where(whereClause).Find(&thanksEmails)
+
+	size := len(followups) +
+		len(interviews) +
+		len(thanksEmails)
+	iEvents := GroupRandomIEvents(size,
+		followups,
+		interviews,
+		thanksEmails,
+	)
+	// sort them by CreatedAt
+	sort.Sort(ByCreationDate(iEvents))
+	return iEvents, nil
+
+}
+func GenerateIEventPersonWhereClauseause(personIds ...int64) string {
+	if len(jobIds) > 0 {
+		// person_id should only exist in the foo_people
+		// and people_foo tables.
+		return fmt.Sprintf("where  person_id = %v", personIds[0])
+		// don't need to worry about SQL Injection because
+		// it can't possibly be anything other than an int.
+	} else {
+		return "where true"
+	}
+}

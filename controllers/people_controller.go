@@ -20,10 +20,20 @@ func (cc *PeopleController) Create(w rest.ResponseWriter,
 	person := models.Person{}
 	if err := r.DecodeJsonPayload(&person); err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		// TODO: error JSON
 		return
 	}
+	// convert ids to jobs
+
+	if err := person.ConvertIdsToJobs(db); err != nil {
+		rest.Error(w, err.Error(), http.StatusNotFound)
+		// TODO: error JSON
+		return
+	}
+
 	if err := cc.Db.Save(&person).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		// TODO: error JSON
 		return
 	}
 	w.WriteJson(

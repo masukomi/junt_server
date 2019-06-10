@@ -33,7 +33,36 @@ func (e ByCreationDate) Swap(i, j int) {
 }
 
 /// end madness... for now
+func GetPersonEvents(db *gorm.DB, personIds ...int64) ([]IEvent, error) {
+	if len(personIds) > 1 {
+		return []IEvent{}, errors.New("maximum of one person per request")
+	}
 
+	// TODO: figure out some way to
+	// make this less... manual
+	followups := []Followup{}
+	interviews := []Interview{}
+	thanksEmails := []ThanksEmail{}
+
+	whereClause := GenerateIEventWhereClause(personIds...)
+	// db.Where("job_id = ?", job_id).Find(&homeworks)
+	db.Where(whereClause).Find(&followups)
+	db.Where(whereClause).Find(&interviews)
+	db.Where(whereClause).Find(&thanksEmails)
+
+	size := len(followups) +
+		len(interviews) +
+		len(thanksEmails)
+	iEvents := GroupRandomIEvents(size,
+		followups,
+		interviews,
+		thanksEmails,
+	)
+	// sort them by CreatedAt
+	sort.Sort(ByCreationDate(iEvents))
+	return iEvents, nil
+
+}
 func GetIEvents(db *gorm.DB, jobIds ...int64) ([]IEvent, error) {
 	if len(jobIds) > 1 {
 		return []IEvent{}, errors.New("maximum of one job per request")
@@ -50,6 +79,10 @@ func GetIEvents(db *gorm.DB, jobIds ...int64) ([]IEvent, error) {
 
 	whereClause := GenerateIEventWhereClause(jobIds...)
 	// db.Where("job_id = ?", job_id).Find(&homeworks)
+	//db.Model(&user).Association("Languages").Find(&languages)
+	//db.Preload("Friends").First(&user, "id = ?", 1)
+	//---
+	// db.Preload("People").Find(&followup,
 	db.Where(whereClause).Find(&followups)
 	db.Where(whereClause).Find(&homeworks)
 	db.Where(whereClause).Find(&interviews)
@@ -95,7 +128,18 @@ func GroupRandomIEvents(size int, iEventsSlices ...interface{}) []IEvent {
 }
 func GenerateIEventWhereClause(jobIds ...int64) string {
 	if len(jobIds) > 0 {
-		return fmt.Sprintf("where job_id = %v", jobIds[0])
+		return fmt.Sprintf("where  = %v", jobIds[0])
+		// don't need to worry about SQL Injection because
+		// it can't possibly be anything other than an int.
+	} else {
+		return "where true"
+	}
+}
+func GenerateIEventPersonWhereClauseause(personIds ...int64) string {
+	if len(jobIds) > 0 {
+		// person_id should only exist in the foo_people
+		// and people_foo tables.
+		return fmt.Sprintf("where  person_id = %v", personIds[0])
 		// don't need to worry about SQL Injection because
 		// it can't possibly be anything other than an int.
 	} else {
