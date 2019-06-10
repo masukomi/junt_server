@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"

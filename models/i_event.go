@@ -33,36 +33,37 @@ func (e ByCreationDate) Swap(i, j int) {
 }
 
 /// end madness... for now
-func GetPersonEvents(db *gorm.DB, personIds ...int64) ([]IEvent, error) {
-	if len(personIds) > 1 {
-		return []IEvent{}, errors.New("maximum of one person per request")
-	}
+// func GetPersonEvents(db *gorm.DB, personIds ...int64) ([]IEvent, error) {
+// 	if len(personIds) > 1 {
+// 		return []IEvent{}, errors.New("maximum of one person per request")
+// 	}
+//
+// 	// TODO: figure out some way to
+// 	// make this less... manual
+// 	followups := []Followup{}
+// 	interviews := []Interview{}
+// 	thanksEmails := []ThanksEmail{}
+//
+// 	whereClause := GenerateIEventWhereClause(personIds...)
+// 	// db.Where("job_id = ?", job_id).Find(&homeworks)
+// 	db.Where(whereClause).Find(&followups)
+// 	db.Where(whereClause).Find(&interviews)
+// 	db.Where(whereClause).Find(&thanksEmails)
+//
+// 	size := len(followups) +
+// 		len(interviews) +
+// 		len(thanksEmails)
+// 	iEvents := GroupRandomIEvents(size,
+// 		followups,
+// 		interviews,
+// 		thanksEmails,
+// 	)
+// 	// sort them by CreatedAt
+// 	sort.Sort(ByCreationDate(iEvents))
+// 	return iEvents, nil
+//
+// }
 
-	// TODO: figure out some way to
-	// make this less... manual
-	followups := []Followup{}
-	interviews := []Interview{}
-	thanksEmails := []ThanksEmail{}
-
-	whereClause := GenerateIEventWhereClause(personIds...)
-	// db.Where("job_id = ?", job_id).Find(&homeworks)
-	db.Where(whereClause).Find(&followups)
-	db.Where(whereClause).Find(&interviews)
-	db.Where(whereClause).Find(&thanksEmails)
-
-	size := len(followups) +
-		len(interviews) +
-		len(thanksEmails)
-	iEvents := GroupRandomIEvents(size,
-		followups,
-		interviews,
-		thanksEmails,
-	)
-	// sort them by CreatedAt
-	sort.Sort(ByCreationDate(iEvents))
-	return iEvents, nil
-
-}
 func GetIEvents(db *gorm.DB, jobIds ...int64) ([]IEvent, error) {
 	if len(jobIds) > 1 {
 		return []IEvent{}, errors.New("maximum of one job per request")
@@ -136,7 +137,7 @@ func GenerateIEventWhereClause(jobIds ...int64) string {
 	}
 }
 func GenerateIEventPersonWhereClauseause(personIds ...int64) string {
-	if len(jobIds) > 0 {
+	if len(personIds) > 0 {
 		// person_id should only exist in the foo_people
 		// and people_foo tables.
 		return fmt.Sprintf("where  person_id = %v", personIds[0])

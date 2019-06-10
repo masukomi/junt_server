@@ -23,7 +23,7 @@ func (cc *ThanksEmailsController) Create(w rest.ResponseWriter,
 		return
 	}
 
-	if err := thanksEmail.ConvertIdsToPeople(cc.Db); err != nil {
+	if err := models.ConvertIdsToPeople(cc.Db, &thanksEmail); err != nil {
 		// TODO JSON ERROR STATUS
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return

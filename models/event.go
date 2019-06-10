@@ -26,9 +26,10 @@ type Event struct {
 	CreatedAt time.Time `json:"created_at"`                              // generated if not supplied
 	UpdatedAt time.Time `json:"updated_at"`                              // generated if not supplied
 
-	Note  string `sql:"type:text;" json:"note"` // markdown
-	JobId int64  `json:"job_id"`
-	Job   Job    `gorm:"foreignkey:JobId" json:"-"`
+	Note      string `sql:"type:text;" json:"note"` // markdown
+	JobId     int64  `json:"job_id"`
+	Job       Job    `gorm:"foreignkey:JobId" json:"-"`
+	EventType string `json:"event_type" gorm:"-"`
 }
 
 // implementing IEvent interface

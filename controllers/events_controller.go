@@ -35,3 +35,17 @@ func (ec *EventsController) ListAllForJob(w rest.ResponseWriter,
 			"description": "no job id found: " + err.Error()})
 	}
 }
+
+func (ec *EventsController) ListAllForPerson(w rest.ResponseWriter,
+	r *rest.Request) {
+	strId := r.PathParam("id")
+	id, err := strconv.ParseInt(strId, 10, 64)
+	if err == nil {
+		events, _ := models.GetPersonEvents(ec.Db, id)
+		// err is only if you have > 1 jobId which we don't ;)
+		w.WriteJson(&events)
+	} else {
+		w.WriteJson(map[string]string{"status": "ERROR",
+			"description": "no job id found: " + err.Error()})
+	}
+}

@@ -2,69 +2,63 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"sort"
 )
 
-type PeopleEvent struct {
-	Event
-	People    []Person `json:"-"`
-	PersonIds []int64  `json:"person_ids" gorm:"-"`
+type IPersonEvent interface {
+	GetPeople() []Person                // gets People from People
+	ExtractPeople(db *gorm.DB) []Person // gets people via PersonIds
+	GetPersonIds() []int64              // gets the ids from PersonIds
+	// ExtractPersonIds() []int64 // gets the ids via People
+	SetPeople(peeps []Person)
+	SetPersonIds(personIds []int64)
+	UpdateEventFromJson(data map[string]interface{}, db *gorm.DB) error
 }
 
-func (pe *PeopleEvent) GetPersonIds() []int64 {
+// type PeopleEvent struct {
+// 	Event
+// 	People    []Person `json:"-"`
+// 	PersonIds []int64  `json:"person_ids" gorm:"-"`
+// }
 
-	person_ids := make([]int64, len(pe.People))
-	for i, p := range pe.People {
+func ExtractPersonIds(ipe IPersonEvent) []int64 {
+	peeps := ipe.GetPeople()
+	person_ids := make([]int64, len(peeps))
+	for i, p := range peeps {
 		person_ids[i] = p.Id
 	}
 	return person_ids
 }
 
-/// JSON RELATED STUFF
-// NOTE: unmarshall via normal means
-// THEN call ConvertIdsToPeople
-
-// func (pe *PeopleEvent) MarshalJSON() ([]byte, error) {
-// 	fmt.Println("XXXXX in PeopleEvent#MarshalJSON")
-// 	personIds := pe.GetPersonIds()
-// 	type Alias PeopleEvent
-// 	return json.Marshal(&struct {
-// 		PersonIds []int64 `json:"person_ids"`
-// 		*Alias
-// 	}{
-// 		Alias:     (*Alias)(pe),
-// 		PersonIds: personIds,
-// 	})
-// }
-func (pe *PeopleEvent) SetPeople(peeps []Person) {
-	pe.People = peeps
-}
-func (pe *PeopleEvent) ConvertIdsToPeople(db *gorm.DB) error {
-	peeps := make([]Person, len(pe.GetPersonIds()))
-	for i, pid := range pe.GetPersonIds() {
+func ConvertIdsToPeople(db *gorm.DB, ipe IPersonEvent) error {
+	peep_ids := ipe.GetPersonIds()
+	peeps := make([]Person, len(peep_ids))
+	for i, pid := range peep_ids {
 		person := Person{}
 		if err := db.First(&person, pid).Error; err != nil {
 			return err
 		}
 		peeps[i] = person
 	}
-	pe.SetPeople(peeps)
+	ipe.SetPeople(peeps)
 	return nil
 }
-func (pe *PeopleEvent) UpdatePeopleEventFromJson(data map[string]interface{}, db *gorm.DB) error {
-	if err := pe.UpdateEventFromJson(data, db); err != nil {
+func UpdatePeopleEventFromJson(data map[string]interface{}, db *gorm.DB, ipe IPersonEvent) error {
+	if err := ipe.UpdateEventFromJson(data, db); err != nil {
 		return err
 	}
-	value, ok := data["person_ids"]
+	value, ok := data["personIds"]
 	if ok {
-		person_ids := []int64{}
+		personIds := []int64{}
 		for _, num := range value.([]interface{}) { // []interface{}
-			person_ids = append(person_ids, int64(num.(float64)))
+			personIds = append(personIds, int64(num.(float64)))
 		}
-		pe.PersonIds = person_ids
-		if err := pe.ConvertIdsToPeople(db); err != nil {
-			return errors.New("invalid associated person_ids")
+		ipe.SetPersonIds(personIds)
+		if err := ipe.ExtractPeople(db); err != nil {
+			return errors.New("invalid associated personIds")
 		}
 	}
 	// if not ok, no worries. they weren't updating that association
@@ -100,8 +94,8 @@ func GetPersonEvents(db *gorm.DB, personIds ...int64) ([]IEvent, error) {
 	return iEvents, nil
 
 }
-func GenerateIEventPersonWhereClauseause(personIds ...int64) string {
-	if len(jobIds) > 0 {
+func GenerateIEventPersonWhereClause(personIds ...int64) string {
+	if len(personIds) > 0 {
 		// person_id should only exist in the foo_people
 		// and people_foo tables.
 		return fmt.Sprintf("where  person_id = %v", personIds[0])

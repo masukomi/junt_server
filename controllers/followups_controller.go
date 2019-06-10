@@ -23,7 +23,7 @@ func (cc *FollowupsController) Create(w rest.ResponseWriter,
 		return
 	}
 
-	if err := followup.ConvertIdsToPeople(cc.Db); err != nil {
+	if err := models.ConvertIdsToPeople(cc.Db, &followup); err != nil {
 		// TODO JSON ERROR STATUS
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -43,7 +43,7 @@ func (cc *FollowupsController) FindById(w rest.ResponseWriter,
 
 	id := r.PathParam("id")
 	followup := models.Followup{}
-	if cc.Db.First(&followup, id).Error != nil {
+	if cc.Db.Preload("People").First(&followup, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}

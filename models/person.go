@@ -43,6 +43,8 @@ type Person struct {
 	// overrides the one from JobThing
 	Company      Company       `json:"-" gorm:"gorm:foreignkey:CompanyId"`
 	ThanksEmails []ThanksEmail `json:"-" gorm:"many2many:people_thanks_emails;"` // has and belongs to many jobs
+	Interviews   []Interview   `json:"-" gorm:"many2many:interviews_people;"`
+	Followups    []Followup    `json:"-" gorm:"many2many:followups_people;"`
 }
 
 func (p Person) HolisticDeletion(db *gorm.DB) (bool, error) {

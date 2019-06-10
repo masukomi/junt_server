@@ -24,7 +24,7 @@ func (cc *InterviewsController) Create(w rest.ResponseWriter,
 		return
 	}
 
-	if err := interview.ConvertIdsToPeople(cc.Db); err != nil {
+	if err := models.ConvertIdsToPeople(cc.Db, &interview); err != nil {
 		// TODO JSON ERROR STATUS
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -45,7 +45,7 @@ func (cc *InterviewsController) FindById(w rest.ResponseWriter,
 
 	id := r.PathParam("id")
 	interview := models.Interview{}
-	if cc.Db.Preload("People").First(&interview, id).Error != nil {
+	if cc.Db.Set("gorm:auto_preload", true).First(&interview, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}

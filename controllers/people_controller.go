@@ -25,7 +25,7 @@ func (cc *PeopleController) Create(w rest.ResponseWriter,
 	}
 	// convert ids to jobs
 
-	if err := person.ConvertIdsToJobs(db); err != nil {
+	if err := person.ConvertIdsToJobs(cc.Db); err != nil {
 		rest.Error(w, err.Error(), http.StatusNotFound)
 		// TODO: error JSON
 		return
