@@ -32,10 +32,45 @@ type Event struct {
 	EventType string `json:"event_type" gorm:"-"`
 }
 
-// implementing IEvent interface
+func (e Event) GetJob() Job {
+	return e.Job
+}
+
+/// boilerplate for IEvent
+func (e Event) ExtractJob(db *gorm.DB) MaybeJob { // gets jobs via JobId
+	job := Job{}
+	if db.Preload("People").First(&job, e.JobId).Error != nil {
+		return JustJob(job)
+	}
+	return ErrorJob(errors.New("invalid or no job id"))
+}
+
+func (e Event) GetJobId() int64 { // gets the ids from JobIds
+	return e.Job.Id
+}
+
+func (e Event) SetJob(job Job) {
+	e.Job = job
+}
+func (e Event) SetJobId(jobId int64) {
+	e.JobId = jobId
+}
+
 func (e Event) CreationDate() time.Time {
 	return e.CreatedAt
 }
+
+func (e Event) ConvertIdToJob(db *gorm.DB) error {
+	job := Job{}
+	if err := db.Preload("People").First(&job, e.JobId).Error; err != nil {
+		e.SetJob(job)
+		return nil
+	} else {
+		return err
+	}
+}
+
+/// END IEvent boilerplate
 
 func (e Event) HolisticDeletion(db *gorm.DB) (bool, error) {
 
@@ -71,13 +106,13 @@ func (e *Event) UpdateEventFromJson(data map[string]interface{}, db *gorm.DB) er
 		case "note":
 			e.Note = value.(string)
 		case "job_id":
-			e.JobId = int64(value.(float64))
-			job := Job{}
-			if db.First(&job, value).Error != nil {
+			e.SetJobId(int64(value.(float64)))
+
+			err := e.ConvertIdToJob(db)
+			if err != nil {
 				return errors.New("invalid associated job_id: " + strconv.FormatInt(e.JobId, 10))
-				// why can I convert from an int with Itoa but not an int64?
+
 			}
-			e.Job = job
 		}
 	}
 	return nil

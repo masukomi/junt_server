@@ -16,6 +16,8 @@ type CrudController interface {
 	// TODO implement update
 	// Update(w rest.ResponseWriter, r *rest.Request)
 	Delete(w rest.ResponseWriter, r *rest.Request)
+	Update(w rest.ResponseWriter, r *rest.Request)
+
 	UpdateModel(model models.IJsonUpdateable,
 		db *gorm.DB,
 		w rest.ResponseWriter,
@@ -43,10 +45,19 @@ func (cci *CrudControllerImpl) UpdateModel(model models.IJsonUpdateable,
 		return
 
 	}
+	/*commented out because it results in an attempt
+	to save to table named "" which obviously doesn't work
+	I can't figure out how to cast it to whatever model it is
+	without Go bitching about the model not implementing
+	the interface, which it does, but go hates us.
+	If YOU are smart enough to make the following code work
+	it'll clean up a lot of BS copy/paste code and I would
+	be very grateful for the PR.
+	*/
 
-	if err := db.Save(&model).Error; err != nil {
-		rest.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.WriteJson(map[string]string{"status": "SUCCESS"})
+	// if err := db.Save(&model).Error; err != nil {
+	// 	rest.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+	// w.WriteJson(map[string]string{"status": "SUCCESS"})
 }

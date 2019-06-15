@@ -84,20 +84,8 @@ func (tec *ThanksEmailsController) Update(w rest.ResponseWriter, r *rest.Request
 		return
 	}
 
-	// TODO decode into
-	var data map[string]interface{}
-
-	if err := r.DecodeJsonPayload(&data); err != nil {
-		rest.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := thanksEmail.UpdateFromJson(data, tec.Db); err != nil {
-		w.WriteJson(map[string]string{"status": "ERROR", "description": err.Error()})
-		rest.Error(w, "JSON didn't meet API expectations", http.StatusUnprocessableEntity)
-		return
-
-	}
-
+	tec.UpdateModel(&thanksEmail, tec.Db, w, r)
+	// see comment in UpdateModel for why this isn't there
 	if err := tec.Db.Save(&thanksEmail).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return

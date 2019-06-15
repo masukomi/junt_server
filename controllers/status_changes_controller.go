@@ -43,6 +43,23 @@ func (cc *StatusChangesController) FindById(w rest.ResponseWriter,
 	w.WriteJson(&statusChange)
 }
 
+func (scc *StatusChangesController) Update(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	statusChange := models.StatusChange{}
+	if scc.Db.First(&statusChange, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	scc.UpdateModel(&statusChange, scc.Db, w, r)
+	// see comment in UpdateModel for why this isn't there
+	if err := scc.Db.Save(&statusChange).Error; err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteJson(map[string]string{"status": "SUCCESS"})
+}
 func (cc *StatusChangesController) Delete(w rest.ResponseWriter,
 	r *rest.Request) {
 

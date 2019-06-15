@@ -52,10 +52,7 @@ func UpdatePeopleEventFromJson(data map[string]interface{}, db *gorm.DB, ipe IPe
 	}
 	value, ok := data["personIds"]
 	if ok {
-		personIds := []int64{}
-		for _, num := range value.([]interface{}) { // []interface{}
-			personIds = append(personIds, int64(num.(float64)))
-		}
+		personIds := ExtractIdsFromJsonArray(value.([]interface{}))
 		ipe.SetPersonIds(personIds)
 		if err := ipe.ExtractPeople(db); err != nil {
 			return errors.New("invalid associated personIds")

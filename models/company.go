@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
@@ -89,4 +90,38 @@ func (c *Company) MarshalJSON() ([]byte, error) {
 		PersonIds: personIds,
 		Alias:     (*Alias)(c),
 	})
+}
+
+func (c *Company) UpdateFromJson(data map[string]interface{}, db *gorm.DB) error {
+
+	for key, value := range data {
+		switch key {
+		case "created_at":
+			mTime := MaybeTimeFromValue(value.(string))
+			if !mTime.IsError() {
+				c.CreatedAt = mTime.Just
+			} else {
+				return errors.New("invalid created_at time: \"" + value.(string) + "\" Use RFC3339")
+			}
+		case "updated_at":
+			mTime := MaybeTimeFromValue(value.(string))
+			if !mTime.IsError() {
+				c.UpdatedAt = mTime.Just
+			} else {
+				return errors.New("invalid created_at time: \"" + value.(string) + "\" Use RFC3339")
+			}
+		case "note":
+			c.Note = value.(string)
+		case "name":
+			if value == nil {
+				return errors.New("Companies must have a name")
+			}
+			c.Name = value.(string)
+		case "url":
+			c.Url = value.(string)
+		case "location":
+			c.Location = value.(string)
+		}
+	}
+	return nil
 }

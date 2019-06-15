@@ -2,8 +2,10 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"strconv"
 	"time"
 )
 
@@ -52,7 +54,7 @@ type Job struct {
 	// `gorm:"foreignkey:UserMemberNumber;association_foreignkey:MemberNumber"`
 }
 
-func (j Job) transactionableHolisticDeletion(db *gorm.DB, transaction *gorm.DB) (bool, error) {
+func (j *Job) transactionableHolisticDeletion(db *gorm.DB, transaction *gorm.DB) (bool, error) {
 
 	// find all the events
 	// returns slice of IEvent objects
@@ -81,11 +83,11 @@ func (j Job) transactionableHolisticDeletion(db *gorm.DB, transaction *gorm.DB) 
 	}
 }
 
-func (j Job) HolisticDeletion(db *gorm.DB) (bool, error) {
+func (j *Job) HolisticDeletion(db *gorm.DB) (bool, error) {
 	return j.transactionableHolisticDeletion(db, db.Begin())
 }
 
-func (j Job) TransactionlessHolisticDeletion(db *gorm.DB) (bool, error) {
+func (j *Job) TransactionlessHolisticDeletion(db *gorm.DB) (bool, error) {
 	return j.transactionableHolisticDeletion(db, nil)
 }
 
@@ -104,4 +106,56 @@ func (j *Job) MarshalJSON() ([]byte, error) {
 		PersonIds: personIds,
 		Alias:     (*Alias)(j),
 	})
+}
+
+func (j *Job) UpdateFromJson(data map[string]interface{}, db *gorm.DB) error {
+
+	for key, value := range data {
+		switch key {
+		case "created_at":
+			mTime := MaybeTimeFromValue(value.(string))
+			if !mTime.IsError() {
+				j.CreatedAt = mTime.Just
+			} else {
+				return errors.New("invalid created_at time: \"" + value.(string) + "\" Use RFC3339")
+			}
+		case "updated_at":
+			mTime := MaybeTimeFromValue(value.(string))
+			if !mTime.IsError() {
+				j.UpdatedAt = mTime.Just
+			} else {
+				return errors.New("invalid updated_at time: \"" + value.(string) + "\" Use RFC3339")
+			}
+		case "note":
+			j.Note = value.(string)
+		case "posting_url":
+			j.PostingUrl = value.(string)
+		case "source":
+			j.Source = value.(string)
+		case "referred_by":
+			j.ReferredBy = value.(string)
+		case "salary_range":
+			j.SalaryRange = value.(string)
+		case "application_method":
+			j.ApplicationMethod = value.(string)
+		case "job_title":
+			if value == nil {
+				return errors.New("Jobs must have a title")
+			}
+			j.JobTitle = value.(string)
+		case "company_id":
+			if value != nil {
+				j.CompanyId = int64(value.(float64))
+				maybeCompany := MaybeCompanyFromId(j.CompanyId, db)
+				if !maybeCompany.IsError() {
+					j.Company = maybeCompany.Just
+				} else {
+					return errors.New("invalid associated company_id: " + strconv.FormatInt(j.CompanyId, 10))
+				}
+			} else {
+				return errors.New("company_id can't be nil")
+			}
+		}
+	}
+	return nil
 }

@@ -22,7 +22,8 @@ func (cc *FollowupsController) Create(w rest.ResponseWriter,
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	followup.ConvertIdToJob(cc.Db)
+	// all events have a Job but not all events have People
 	if err := models.ConvertIdsToPeople(cc.Db, &followup); err != nil {
 		// TODO JSON ERROR STATUS
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -49,7 +50,6 @@ func (cc *FollowupsController) FindById(w rest.ResponseWriter,
 	}
 	w.WriteJson(&followup)
 }
-
 func (cc *FollowupsController) ListAll(w rest.ResponseWriter,
 	r *rest.Request) {
 	followups := []models.Followup{}
@@ -79,10 +79,30 @@ func (fc *FollowupsController) Update(w rest.ResponseWriter, r *rest.Request) {
 
 	id := r.PathParam("id")
 	followup := models.Followup{}
-	if fc.Db.Preload("People").First(&followup, id).Error != nil {
+	if fc.Db.First(&followup, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
-	fc.UpdateModel(&followup, fc.Db, w, r)
 
+	// // TODO decode into
+	// var data map[string]interface{}
+	//
+	// if err := r.DecodeJsonPayload(&data); err != nil {
+	// 	rest.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+	// if err := followup.UpdateFromJson(data, fc.Db); err != nil {
+	// 	w.WriteJson(map[string]string{"status": "ERROR", "description": err.Error()})
+	// 	rest.Error(w, "JSON didn't meet API expectations", http.StatusUnprocessableEntity)
+	// 	return
+	//
+	// }
+
+	fc.UpdateModel(&followup, fc.Db, w, r)
+	// see comment in UpdateModel for why this isn't there
+	if err := fc.Db.Save(&followup).Error; err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteJson(map[string]string{"status": "SUCCESS"})
 }

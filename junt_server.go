@@ -51,21 +51,29 @@ func main() {
 	ec := controllers.EventsController{i.DB}
 	makeRouterArgs := []*rest.Route{}
 	for name, controller := range crudThings {
+		// get all
 		makeRouterArgs = append(makeRouterArgs, rest.Get("/v1/"+name, controller.ListAll))
-		// ... and with trailing slash
-		makeRouterArgs = append(makeRouterArgs, rest.Get("/v1/"+name+"/", controller.ListAll))
+		// get one
 		makeRouterArgs = append(makeRouterArgs, rest.Get("/v1/"+name+"/:id", controller.FindById))
+		// create one
 		makeRouterArgs = append(makeRouterArgs, rest.Post("/v1/"+name, controller.Create))
-		// ... and with trailing slash
-		makeRouterArgs = append(makeRouterArgs, rest.Post("/v1/"+name+"/", controller.Create))
-		// TODO IMPLEMENT UPDATE
-		// makeRouterArgs = append(makeRouterArgs, rest.Delete("/"+name, controller.Update))
+		// update one
+		makeRouterArgs = append(makeRouterArgs, rest.Put("/v1/"+name+"/:id", controller.Update))
+		// delete one
 		makeRouterArgs = append(makeRouterArgs, rest.Delete("/v1/"+name+"/:id", controller.Delete))
+		// ... and with trailing slashes
+		// get all
+		makeRouterArgs = append(makeRouterArgs, rest.Get("/v1/"+name+"/", controller.ListAll))
+		// get one
+		makeRouterArgs = append(makeRouterArgs, rest.Get("/v1/"+name+"/:id/", controller.FindById))
+		// create one
+		makeRouterArgs = append(makeRouterArgs, rest.Post("/v1/"+name+"/", controller.Create))
+		// delete one
+		makeRouterArgs = append(makeRouterArgs, rest.Delete("/v1/"+name+"/:id/", controller.Delete))
 	}
 
 	makeRouterArgs = append(makeRouterArgs, rest.Get("/v1/events", ec.ListAll))
 	makeRouterArgs = append(makeRouterArgs, rest.Get("/v1/events/", ec.ListAll))
-	makeRouterArgs = append(makeRouterArgs, rest.Get("/v1/events/job/:id", ec.ListAllForJob))
 
 	router, err := rest.MakeRouter(makeRouterArgs...)
 	if err != nil {

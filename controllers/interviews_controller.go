@@ -14,7 +14,7 @@ type InterviewsController struct {
 	Db *gorm.DB
 }
 
-func (cc *InterviewsController) Create(w rest.ResponseWriter,
+func (ic *InterviewsController) Create(w rest.ResponseWriter,
 	r *rest.Request) {
 
 	interview := models.Interview{}
@@ -24,13 +24,13 @@ func (cc *InterviewsController) Create(w rest.ResponseWriter,
 		return
 	}
 
-	if err := models.ConvertIdsToPeople(cc.Db, &interview); err != nil {
+	if err := models.ConvertIdsToPeople(ic.Db, &interview); err != nil {
 		// TODO JSON ERROR STATUS
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := cc.Db.Save(&interview).Error; err != nil {
+	if err := ic.Db.Save(&interview).Error; err != nil {
 		// TODO JSON ERROR STATUS
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -45,7 +45,7 @@ func (cc *InterviewsController) FindById(w rest.ResponseWriter,
 
 	id := r.PathParam("id")
 	interview := models.Interview{}
-	if cc.Db.Set("gorm:auto_preload", true).First(&interview, id).Error != nil {
+	if cc.Db.Preload("People").First(&interview, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
@@ -85,20 +85,8 @@ func (ic *InterviewsController) Update(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	// TODO decode into
-	var data map[string]interface{}
-
-	if err := r.DecodeJsonPayload(&data); err != nil {
-		rest.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := interview.UpdateFromJson(data, ic.Db); err != nil {
-		w.WriteJson(map[string]string{"status": "ERROR", "description": err.Error()})
-		rest.Error(w, "JSON didn't meet API expectations", http.StatusUnprocessableEntity)
-		return
-
-	}
-
+	ic.UpdateModel(&interview, ic.Db, w, r)
+	// see comment in UpdateModel for why this isn't there
 	if err := ic.Db.Save(&interview).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return

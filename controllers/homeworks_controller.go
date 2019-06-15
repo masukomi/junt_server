@@ -22,6 +22,8 @@ func (cc *HomeworksController) Create(w rest.ResponseWriter,
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	homework.ConvertIdToJob(cc.Db)
+	// all events have a Job but not all events have People
 	if err := cc.Db.Save(&homework).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -41,6 +43,24 @@ func (cc *HomeworksController) FindById(w rest.ResponseWriter,
 		return
 	}
 	w.WriteJson(&homework)
+}
+func (hc *HomeworksController) Update(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	homework := models.Homework{}
+	if hc.Db.First(&homework, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	hc.UpdateModel(&homework, hc.Db, w, r)
+	// see comment in UpdateModel for why this isn't there
+	if err := hc.Db.Save(&homework).Error; err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteJson(map[string]string{"status": "SUCCESS"})
+
 }
 
 func (cc *HomeworksController) Delete(w rest.ResponseWriter,

@@ -12,27 +12,14 @@ import (
 type IEvent interface {
 	CreationDate() time.Time
 	HolisticDeletion(db *gorm.DB) (bool, error)
+	GetJob() Job                     // gets jobs from Jobs
+	ExtractJob(db *gorm.DB) MaybeJob // gets jobs via JobIds
+	GetJobId() int64                 // gets the ids from JobIds
+	SetJob(job Job)
+	SetJobId(jobId int64)
+	ConvertIdToJob(db *gorm.DB) error
 }
 
-// the folowing BS is because Go hates you
-// and doesn't want you to have anything nice
-// like Ruby's Comparable functionality.
-// I'm sorry. Really.
-type ByCreationDate []IEvent
-
-func (e ByCreationDate) Len() int {
-	return len(e)
-}
-
-func (e ByCreationDate) Less(i, j int) bool {
-	return e[i].CreationDate().Unix() < e[j].CreationDate().Unix()
-}
-
-func (e ByCreationDate) Swap(i, j int) {
-	e[i], e[j] = e[j], e[i]
-}
-
-/// end madness... for now
 // func GetPersonEvents(db *gorm.DB, personIds ...int64) ([]IEvent, error) {
 // 	if len(personIds) > 1 {
 // 		return []IEvent{}, errors.New("maximum of one person per request")
@@ -147,3 +134,24 @@ func GenerateIEventPersonWhereClauseause(personIds ...int64) string {
 		return "where true"
 	}
 }
+
+// SORTING
+// the folowing BS is because Go hates you
+// and doesn't want you to have anything nice
+// like Ruby's Comparable functionality.
+// I'm sorry. Really.
+type ByCreationDate []IEvent
+
+func (e ByCreationDate) Len() int {
+	return len(e)
+}
+
+func (e ByCreationDate) Less(i, j int) bool {
+	return e[i].CreationDate().Unix() < e[j].CreationDate().Unix()
+}
+
+func (e ByCreationDate) Swap(i, j int) {
+	e[i], e[j] = e[j], e[i]
+}
+
+/// end madness... for now

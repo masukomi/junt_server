@@ -42,6 +42,23 @@ func (cc *OffersController) FindById(w rest.ResponseWriter,
 	}
 	w.WriteJson(&offer)
 }
+func (oc *OffersController) Update(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	offer := models.Offer{}
+	if oc.Db.First(&offer, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	oc.UpdateModel(&offer, oc.Db, w, r)
+	// see comment in UpdateModel for why this isn't there
+	if err := oc.Db.Save(&offer).Error; err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteJson(map[string]string{"status": "SUCCESS"})
+}
 
 func (cc *OffersController) Delete(w rest.ResponseWriter,
 	r *rest.Request) {

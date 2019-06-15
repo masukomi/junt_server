@@ -14,7 +14,7 @@ type JobsController struct {
 	Db *gorm.DB
 }
 
-func (cc *JobsController) Create(w rest.ResponseWriter,
+func (jc *JobsController) Create(w rest.ResponseWriter,
 	r *rest.Request) {
 
 	job := models.Job{}
@@ -22,7 +22,7 @@ func (cc *JobsController) Create(w rest.ResponseWriter,
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := cc.Db.Save(&job).Error; err != nil {
+	if err := jc.Db.Save(&job).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -31,35 +31,72 @@ func (cc *JobsController) Create(w rest.ResponseWriter,
 
 }
 
-func (cc *JobsController) FindById(w rest.ResponseWriter,
+func (jc *JobsController) FindById(w rest.ResponseWriter,
 	r *rest.Request) {
 
 	id := r.PathParam("id")
 	job := models.Job{}
-	if cc.Db.Preload("People").First(&job, id).Error != nil {
+	if jc.Db.Preload("People").First(&job, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
 	w.WriteJson(&job)
 }
 
-func (cc *JobsController) ListAll(w rest.ResponseWriter,
+func (jc *JobsController) Edit(w rest.ResponseWriter,
 	r *rest.Request) {
-	jobs := []models.Job{}
-	cc.Db.Preload("People").Find(&jobs)
-	w.WriteJson(&jobs)
+	id := r.PathParam("id")
+	job := models.Job{}
+	if jc.Db.First(&job, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	if err := r.DecodeJsonPayload(&job); err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := jc.Db.Save(&job).Error; err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteJson(
+		map[string]interface{}{"status": "SUCCESS", "id": job.Id})
 }
-
-func (cc *JobsController) Delete(w rest.ResponseWriter,
+func (jc *JobsController) Update(w rest.ResponseWriter,
 	r *rest.Request) {
 
 	id := r.PathParam("id")
 	job := models.Job{}
-	if cc.Db.First(&job, id).Error != nil {
+	if jc.Db.First(&job, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
-	success, err := job.HolisticDeletion(cc.Db)
+	jc.UpdateModel(&job, jc.Db, w, r)
+	// see comment in UpdateModel for why this isn't there
+	if err := jc.Db.Save(&job).Error; err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteJson(map[string]string{"status": "SUCCESS"})
+}
+
+func (jc *JobsController) ListAll(w rest.ResponseWriter,
+	r *rest.Request) {
+	jobs := []models.Job{}
+	jc.Db.Preload("People").Find(&jobs)
+	w.WriteJson(&jobs)
+}
+
+func (jc *JobsController) Delete(w rest.ResponseWriter,
+	r *rest.Request) {
+
+	id := r.PathParam("id")
+	job := models.Job{}
+	if jc.Db.First(&job, id).Error != nil {
+		rest.NotFound(w, r)
+		return
+	}
+	success, err := job.HolisticDeletion(jc.Db)
 	if success {
 		w.WriteJson(map[string]string{"status": "SUCCESS"})
 	} else {

@@ -2,8 +2,10 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"strconv"
 	"time"
 )
 
@@ -74,4 +76,54 @@ func (p *Person) MarshalJSON() ([]byte, error) {
 		JobIds: jobIds,
 		Alias:  (*Alias)(p),
 	})
+}
+
+func (p *Person) UpdateFromJson(data map[string]interface{}, db *gorm.DB) error {
+
+	for key, value := range data {
+		switch key {
+		case "created_at":
+			mTime := MaybeTimeFromValue(value.(string))
+			if !mTime.IsError() {
+				p.CreatedAt = mTime.Just
+			} else {
+				return errors.New("invalid created_at time: \"" + value.(string) + "\" Use RFC3339")
+			}
+		case "updated_at":
+			mTime := MaybeTimeFromValue(value.(string))
+			if !mTime.IsError() {
+				p.UpdatedAt = mTime.Just
+			} else {
+				return errors.New("invalid updated_at time: \"" + value.(string) + "\" Use RFC3339")
+			}
+		case "note":
+			p.Note = EmptyStringForNilString(value)
+		case "name":
+			p.Name = EmptyStringForNilString(value)
+		case "email":
+			p.Email = EmptyStringForNilString(value)
+		case "phone":
+
+			p.Phone = EmptyStringForNilString(value)
+		case "company_id":
+			if value != "" {
+				p.CompanyId = int64(value.(float64))
+				maybeCompany := MaybeCompanyFromId(p.CompanyId, db)
+				if !maybeCompany.IsError() {
+					p.Company = maybeCompany.Just
+				} else {
+					return errors.New("invalid associated company_id: " + strconv.FormatInt(p.CompanyId, 10))
+				}
+			} else {
+				return errors.New("company_id can't be empty")
+			}
+		case "job_ids":
+			if value != "" {
+				jobIds := ExtractIdsFromJsonArray(value.([]interface{}))
+				p.JobIds = jobIds
+				p.ConvertIdsToJobs(db)
+			}
+		}
+	}
+	return nil
 }
